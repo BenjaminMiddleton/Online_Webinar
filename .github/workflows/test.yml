@@ -9,9 +9,6 @@ on:
 jobs:
   test:
     runs-on: ubuntu-latest
-    env:
-      HF_TOKEN: ${{ secrets.HF_TOKEN }}
-      OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
 
     steps:
     - name: Checkout code
@@ -26,16 +23,19 @@ jobs:
       run: |
         python -m pip install --upgrade pip
         pip install -r requirements.txt
+        pip install pytest pytest-cov python-dotenv  # Install python-dotenv
 
-    - name: Display environment variables
+    - name: Create .env file
       run: |
-        echo "HF_TOKEN: $HF_TOKEN"
-        echo "OPENAI_API_KEY: $OPENAI_API_KEY"
-        
+        echo "HF_TOKEN=${{ secrets.HF_TOKEN }}" > .env
+        echo "OPENAI_API_KEY=${{ secrets.OPENAI_API_KEY }}" >> .env
+        cat .env  # Display the .env file content
+
     - name: Run tests
       run: |
-        pytest tests/ --cov=backend --cov-report=xml
-        
+        python -c "import os; from dotenv import load_dotenv; load_dotenv(); print(os.getenv('HF_TOKEN')); print(os.getenv('OPENAI_API_KEY'))" # Verify env vars are loaded
+        pytest -v --cov=backend --cov-report=xml tests/  # Verbose output and correct test path
+
     - name: Upload coverage
       uses: codecov/codecov-action@v2
       with:
