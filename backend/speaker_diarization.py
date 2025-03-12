@@ -46,21 +46,14 @@ def load_models():
     """Loads the Whisper and Pyannote models."""
     global whisper_model, diarization_pipeline
     try:
-        # Try CUDA with float16 first
-        print("Attempting CUDA with float16...")
-        whisper_model = WhisperModel("medium.en", device="cuda", compute_type="float16")
-        print("Successfully loaded model with CUDA float16")
-    except ValueError:
-        try:
-            # Try CUDA with float32
-            print("Attempting CUDA with float32...")
-            whisper_model = WhisperModel("medium.en", device="cuda", compute_type="float32")
-            print("Successfully loaded model with CUDA float32")
-        except:
-            # CPU fallback
-            print("Falling back to CPU with int8...")
-            whisper_model = WhisperModel("medium.en", device="cpu", compute_type="int8")
-            print("Successfully loaded model with CPU int8")
+        # CPU fallback
+        print("Loading model with CPU int8...")
+        whisper_model = WhisperModel("medium.en", device="cpu", compute_type="int8")
+        print("Successfully loaded model with CPU int8")
+
+    except Exception as e:
+        print(f"Error loading Whisper model: {e}")
+        raise
 
     diarization_pipeline = Pipeline.from_pretrained(
         "pyannote/speaker-diarization",
