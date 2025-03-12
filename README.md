@@ -26,7 +26,7 @@ A powerful AI-assisted application that transforms audio recordings of meetings 
 
 ```bash
 git clone [repository-url]
-cd CURRENT_Meeting_Management_Project_Prototype_Root
+cd Meeting-Management-Project
 ```
 
 ### 2. Install backend dependencies

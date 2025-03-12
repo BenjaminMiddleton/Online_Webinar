@@ -15,8 +15,11 @@ import signal
 import platform
 
 # Configuration
-BACKEND_CMD = ["python", "backend/app.py"]
-FRONTEND_CMD = ["npm", "start"]
+BACKEND_CMD = ["python", "-m", "backend.app"]
+if platform.system() == "Windows":
+    FRONTEND_CMD = ["npm.cmd", "start"]
+else:
+    FRONTEND_CMD = ["npm", "start"]
 FRONTEND_DIR = "UI"
 FRONTEND_URL = "http://localhost:5173"
 BACKEND_URL = "http://localhost:5000"
