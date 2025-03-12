@@ -16,7 +16,7 @@ export type TranscriptBoxType = {
   jobId?: string | null;
 };
 
-const TranscriptBox: React.FC<TranscriptBoxType> = ({
+const TranscriptBox: FunctionComponent<TranscriptBoxType> = ({
   className = "",
   property1 = "Expanded",
   transcription = "",
@@ -114,12 +114,12 @@ const TranscriptBox: React.FC<TranscriptBoxType> = ({
             <div className={styles.collapsibleContent}>
               <div className={styles.searchBox}>
                 <div className={styles.searchText}>
-                  <div className={styles.symbolSearchSmall}>
-                    <svg width="34" height="34" viewBox="0 0 34 34" xmlns="http://www.w3.org/2000/svg">
-                      <path d="M24.5182 22.7084L30 28.1889L28.1889 30L22.7084 24.5182C20.6692 26.1529 18.1327 27.042 15.5191 27.0383C9.16058 27.0383 4 21.8777 4 15.5191C4 9.16058 9.16058 4 15.5191 4C21.8777 4 27.0383 9.16058 27.0383 15.5191C27.042 18.1327 26.1529 20.6692 24.5182 22.7084ZM21.9507 21.7587C23.5747 20.088 24.4817 17.849 24.4785 15.5191C24.4785 10.5698 20.4685 6.55981 15.5191 6.55981C10.5698 6.55981 6.55981 10.5698 6.55981 15.5191C6.55981 20.4685 10.5698 24.4785 15.5191 24.4785C17.849 24.4817 20.088 23.5747 21.7587 21.9507L21.9507 21.7587Z" fill="#A4A4A4"/>
-                    </svg>
-                  </div>
-                  <input className={styles.search} placeholder="Search..." />
+                  <img
+                    className={styles.symbolSearchSmall}
+                    alt=""
+                    src="/symbol-search-small.svg"
+                  />
+                  <input className={styles.search} type="text" placeholder="Search..." />
                 </div>
               </div>
               
