@@ -125,8 +125,7 @@ def create_app(config=None):
     configure_logger(app)
 
     # Set up rate limiting
-    limiter = Limiter(app=app, key_func=get_remote_address,
-                      default_limits=["200 per day", "50 per hour"])
+    limiter = Limiter(app=app, key_func=get_remote_address)
 
     # Initialize Socket.IO with allowed origins from env or fallback
     allowed_origins = [o.strip() for o in os.environ.get("CORS_ALLOWED_ORIGINS", "").split(",") if o.strip()]
@@ -221,8 +220,7 @@ def create_app(config=None):
     # Set up rate limiting
     limiter = Limiter(
         app=app,
-        key_func=get_remote_address,
-        default_limits=["200 per day", "50 per hour"]
+        key_func=get_remote_address
     )
     
     # Register routes and handlers
@@ -512,6 +510,11 @@ def register_routes(app, limiter):
         response = jsonify(Environment.get_config_json())
         response.headers.add('Access-Control-Allow-Origin', '*')
         return response
+
+    @app.route("/api/job_status/<job_id>", methods=["GET"])
+    @limiter.exempt
+    def get_job_status_endpoint_alias(job_id):
+        return get_job_status_endpoint(job_id)
 
 def process_file_background(app, file_extension, filepath, job_id, original_filename):
     """Process the uploaded file in a background thread with improved error handling."""
