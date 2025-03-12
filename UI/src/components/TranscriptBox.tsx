@@ -16,7 +16,7 @@ export type TranscriptBoxType = {
   jobId?: string | null;
 };
 
-const TranscriptBox: FunctionComponent<TranscriptBoxType> = ({
+const TranscriptBox: React.FC<TranscriptBoxType> = ({
   className = "",
   property1 = "Expanded",
   transcription = "",
@@ -114,12 +114,12 @@ const TranscriptBox: FunctionComponent<TranscriptBoxType> = ({
             <div className={styles.collapsibleContent}>
               <div className={styles.searchBox}>
                 <div className={styles.searchText}>
-                  <img
-                    className={styles.symbolSearchSmall}
-                    alt=""
-                    src="/symbol-search-small.svg"
-                  />
-                  <input className={styles.search} type="text" placeholder="Search..." />
+                  <div className={styles.symbolSearchSmall}>
+                    <svg width="34" height="34" viewBox="0 0 34 34" xmlns="http://www.w3.org/2000/svg">
+                      <path d="M12 16l-6-6h12z" fill="#F8F8F8" />
+                    </svg>
+                  </div>
+                  <input className={styles.search} placeholder="Search..." />
                 </div>
               </div>
               
