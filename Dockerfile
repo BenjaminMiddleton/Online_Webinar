@@ -20,7 +20,7 @@ ENV PATH="/root/.cargo/bin:${PATH}"
 RUN apt-get update && apt-get install -y python3 python3-pip
 
 # Set the Python version explicitly
-ENV PYTHON_VERSION 3.8
+ENV PYTHON_VERSION 3.12.9
 
 # Update pip
 RUN pip3 install --no-cache-dir --upgrade pip
@@ -47,7 +47,9 @@ RUN apt-get update && apt-get install -y curl && \
 WORKDIR ${APP_HOME}/UI
 COPY UI/package*.json ./
 RUN npm install
-RUN npm run build
+
+# Capture verbose output from npm run build
+RUN npm run build --verbose 2>&1 | tee build_log.txt
 
 # Copy static files from UI build to backend static folder
 WORKDIR ${APP_HOME}
