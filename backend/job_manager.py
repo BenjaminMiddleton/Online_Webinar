@@ -73,6 +73,14 @@ def update_job_status(job_id: str, status: str, minutes: Optional[Dict[str, Any]
             
         logger.info(f"Updated job status: {job_id} -> {status}")
         
+        if status in ["completed", "error"]:
+            from backend.cleanup import run_cleanup
+            run_cleanup(
+                job_results_dir=str(results_dir),
+                completed_job_retention_hours=0,
+                interrupted_job_retention_minutes=0
+            )
+        
     except Exception as e:
         logger.error(f"Error updating job status: {str(e)}")
 

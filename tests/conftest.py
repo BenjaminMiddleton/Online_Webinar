@@ -42,3 +42,13 @@ def app():
 def client(app):
     """A test client for the app."""
     return app.test_client()
+
+@pytest.fixture(autouse=True)
+def cleanup_jobs():
+    yield
+    from backend.cleanup import run_cleanup
+    run_cleanup(
+        job_results_dir='job_results',
+        completed_job_retention_hours=0,
+        interrupted_job_retention_minutes=0
+    )
