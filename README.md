@@ -26,7 +26,7 @@ A powerful AI-assisted application that transforms audio recordings of meetings 
 
 ```bash
 git clone [repository-url]
-cd CURRENT_Meeting_Management_Project_Prototype_Root
+cd Meeting-Management-Project
 ```
 
 ### 2. Install backend dependencies
@@ -34,7 +34,10 @@ cd CURRENT_Meeting_Management_Project_Prototype_Root
 ```bash
 # Create and activate a virtual environment (recommended)
 python -m venv venv
-source venv/bin/activate  # On Windows: venv\Scripts\activate
+
+On Linux and Mac: source venv/bin/activate
+On Windows CMD: venv\Scripts\activate.bat
+On Windows Powershell: venv\Scripts\activate.psl
 
 # Install dependencies
 pip install -r requirements.txt
