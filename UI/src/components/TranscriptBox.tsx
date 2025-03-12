@@ -2,7 +2,8 @@ import React, { FunctionComponent, useState, useEffect, useRef } from "react";
 import { CSSTransition } from "react-transition-group";
 import CollapseExpandButton from "./CollapseExpandButton";
 import styles from "./TranscriptBox.module.css";
-import { getJobStatus } from "../api/apiService"; // Import the API function
+import { getJobStatus, getLastJobData } from "../api/apiService"; // Import the API functions
+import { useMeetingContext } from "../context/MeetingContext"; // NEW
 
 export type TranscriptBoxType = {
   className?: string;
@@ -30,51 +31,58 @@ const TranscriptBox: React.FC<TranscriptBoxType> = ({
   const [isLoading, setIsLoading] = useState(false);
   const [loadError, setLoadError] = useState<string | null>(null);
   const hasLogged = useRef(false);
+  const { meetingData, setMeetingData } = useMeetingContext(); // NEW
+
+  // New effect: update transcript from meeting context when available
+  useEffect(() => {
+    if (meetingData && meetingData.transcription && meetingData.transcription.trim() !== "") {
+      console.log("TranscriptBox: Updating transcript from MeetingContext");
+      setTranscript(meetingData.transcription);
+      if (meetingData.speakers && meetingData.speakers.length > 0) {
+        setSpeakerList(meetingData.speakers);
+      }
+    }
+  }, [meetingData]);
 
   // Enhanced useEffect for better error handling
   useEffect(() => {
-    // Update from props when they change
-    if (transcription) {
-      setTranscript(transcription);
-      setLoadError(null); // Clear any previous errors
-    }
-    
-    if (speakers && speakers.length > 0) {
-      setSpeakerList(speakers);
-    }
-    
-    // If no transcription provided but we have a jobId, fetch from API
-    if (jobId && !transcription) {
-      let pollInterval: ReturnType<typeof setInterval>; // declare pollInterval outside fetchTranscript
+    if (jobId) {
+      let pollInterval: ReturnType<typeof setInterval>;
       const fetchTranscript = async () => {
         try {
           setIsLoading(true);
-          setLoadError(null); // Clear any previous errors
-          
-          if (!hasLogged.current) {
-            console.log(`TranscriptBox: Fetching data for job ${jobId}`);
-            hasLogged.current = true;
-          }
+          setLoadError(null);
+          console.log(`TranscriptBox: Fetching data for job ${jobId}`);
           const result = await getJobStatus(jobId);
-          
-          if (result.status === 'completed' && result.minutes) {
-            if (result.minutes.transcription) {
-              setTranscript(result.minutes.transcription);
-            } else {
-              setLoadError('No transcript available in the job data');
-            }
-            
+          console.log("TranscriptBox: Received result", result);
+          if (
+            result.status === 'completed' &&
+            result.minutes &&
+            result.minutes.transcription &&
+            result.minutes.transcription.trim().length > 0
+          ) {
+            setTranscript(result.minutes.transcription);
             if (result.minutes.speakers && result.minutes.speakers.length > 0) {
               setSpeakerList(result.minutes.speakers);
             }
-            // Stop polling when job is finished
+            setMeetingData(result.minutes);
             clearInterval(pollInterval);
-          } else if (result.status === 'processing') {
-            setLoadError('Job is still processing. Please wait...');
-          } else if (result.status === 'error') {
-            console.error('TranscriptBox: Job error:', result.error);
-            setLoadError(`Error: ${result.error || 'Unknown error occurred'}`);
-            clearInterval(pollInterval);
+          } else {
+            // Fallback: check localStorage for stored job data
+            const localData = getLastJobData();
+            if (
+              localData.jobId === jobId &&
+              localData.jobData &&
+              localData.jobData.minutes &&
+              localData.jobData.minutes.transcription &&
+              localData.jobData.minutes.transcription.trim().length > 0
+            ) {
+              console.log(`TranscriptBox: Using transcript from localStorage for job ${jobId}`);
+              setTranscript(localData.jobData.minutes.transcription);
+              setLoadError(null);  // Clear error if transcript exists
+            } else {
+              setLoadError('Job is still processing. Please wait...');
+            }
           }
         } catch (error) {
           console.error("Failed to fetch transcript data:", error);
@@ -83,13 +91,18 @@ const TranscriptBox: React.FC<TranscriptBoxType> = ({
           setIsLoading(false);
         }
       };
-      
-      // Fetch immediately and then poll every 10 seconds
       fetchTranscript();
       pollInterval = setInterval(fetchTranscript, 10000);
       return () => clearInterval(pollInterval);
     }
-  }, [transcription, speakers, jobId]);
+  }, [jobId]); // removed transcript from dependency array
+
+  // Compute transcript to display: from context if available, else local state
+  const displayTranscript = meetingData && meetingData.transcription.trim() !== ""
+    ? meetingData.transcription
+    : transcript;
+
+  console.log("Rendering TranscriptBox with transcript:", displayTranscript);
 
   return (
     <div
@@ -142,8 +155,8 @@ const TranscriptBox: React.FC<TranscriptBoxType> = ({
                     <div className={styles.errorMessage}>{loadError}</div>
                   ) : (
                     <div className={styles.transcriptBody} style={{ height: 'auto', overflow: 'visible' }}>
-                      {transcript ? (
-                        <pre className={styles.transcriptText}>{transcript}</pre>
+                      {displayTranscript ? (
+                        <pre className={styles.transcriptText}>{displayTranscript}</pre>
                       ) : (
                         <div className={styles.noTranscript}>No transcript available</div>
                       )}

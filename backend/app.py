@@ -574,7 +574,10 @@ def process_file_background(app, file_extension, filepath, job_id, original_file
             try:
                 if file_extension.lower() in app.config['ALLOWED_AUDIO_EXTENSIONS']:
                     app.logger.info(f"Processing audio file: {filepath}")
-                    app.socketio.emit("processing_update", {"job_id": job_id, "status": "processing_audio"})
+                    try:
+                        app.socketio.emit("processing_update", {"job_id": job_id, "status": "processing_audio"})
+                    except Exception as e:
+                        app.logger.warning(f"SocketIO emit failed (processing_audio): {e}")
                     
                     try:
                         app.logger.info("Running diarize_audio")
@@ -593,7 +596,10 @@ def process_file_background(app, file_extension, filepath, job_id, original_file
                     
                 elif file_extension.lower() in app.config['ALLOWED_VTT_EXTENSIONS']:
                     app.logger.info(f"Processing VTT file: {filepath}")
-                    app.socketio.emit("processing_update", {"job_id": job_id, "status": "processing_vtt"})
+                    try:
+                        app.socketio.emit("processing_update", {"job_id": job_id, "status": "processing_vtt"})
+                    except Exception as e:
+                        app.logger.warning(f"SocketIO emit failed (processing_vtt): {e}")
                     try:
                         transcript = handle_vtt_file(app, filepath)
                         speakers = []  # VTT does not include speakers
@@ -609,7 +615,10 @@ def process_file_background(app, file_extension, filepath, job_id, original_file
                     app.logger.error("Transcript is empty or too short")
                     raise ValueError("Failed to extract meaningful content from the file")
                 
-                app.socketio.emit("processing_update", {"job_id": job_id, "status": "generating_minutes"})
+                try:
+                    app.socketio.emit("processing_update", {"job_id": job_id, "status": "generating_minutes"})
+                except Exception as e:
+                    app.logger.warning(f"SocketIO emit failed (generating_minutes): {e}")
                 meeting_title = base_filename
                 force_chunking = len(transcript) > 8000  # force chunking for long transcripts
                 app.logger.info(f"Generating meeting minutes (length: {len(transcript)}, force_chunking: {force_chunking})")
@@ -628,10 +637,16 @@ def process_file_background(app, file_extension, filepath, job_id, original_file
             except Exception as processing_error:
                 app.logger.error(f"Error during processing: {str(processing_error)}", exc_info=True)
                 update_job_status(job_id, "error", error=str(processing_error))
-                app.socketio.emit("processing_error", {"job_id": job_id, "error": str(processing_error), "timestamp": datetime.now().isoformat()})
+                try:
+                    app.socketio.emit("processing_error", {"job_id": job_id, "error": str(processing_error), "timestamp": datetime.now().isoformat()})
+                except Exception as emit_error:
+                    app.logger.warning(f"SocketIO emit failed (processing_error): {emit_error}")
                 return
             
-            app.socketio.emit("processing_update", {"job_id": job_id, "status": "generating_pdf"})
+            try:
+                app.socketio.emit("processing_update", {"job_id": job_id, "status": "generating_pdf"})
+            except Exception as e:
+                app.logger.warning(f"SocketIO emit failed (generating_pdf): {e}")
             try:
                 app.logger.info("Generating PDF...")
                 pdf_path = generate_pdf(minutes, job_id, original_filename)
@@ -657,27 +672,33 @@ def process_file_background(app, file_extension, filepath, job_id, original_file
             minutes = ensure_complete_minutes(minutes)
             minutes["pdf_path"] = pdf_path
             update_job_status(job_id, "completed", minutes=minutes)
-            app.socketio.emit("processing_complete", {
-                "job_id": job_id,
-                "status": "completed",
-                "pdf_path": pdf_path,
-                "minutes": {
-                    "title": minutes.get("title", ""),
-                    "duration": minutes.get("duration", "00:00"),
-                    "summary": minutes.get("summary", ""),
-                    "action_points": minutes.get("action_points", []),
-                    "transcription": minutes.get("transcription", ""),
-                    "speakers": minutes.get("speakers", [])
-                },
-                "timestamp": datetime.now().isoformat(),
-                "eventType": "processing_complete"
-            })
+            try:
+                app.socketio.emit("processing_complete", {
+                    "job_id": job_id,
+                    "status": "completed",
+                    "pdf_path": pdf_path,
+                    "minutes": {
+                        "title": minutes.get("title", ""),
+                        "duration": minutes.get("duration", "00:00"),
+                        "summary": minutes.get("summary", ""),
+                        "action_points": minutes.get("action_points", []),
+                        "transcription": minutes.get("transcription", ""),
+                        "speakers": minutes.get("speakers", [])
+                    },
+                    "timestamp": datetime.now().isoformat(),
+                    "eventType": "processing_complete"
+                })
+            except Exception as e:
+                app.logger.warning(f"SocketIO emit failed (processing_complete): {e}")
             app.logger.info(f"Completed processing for job: {job_id}")
             
         except Exception as e:
             app.logger.error(f"Error in background processing: {str(e)}", exc_info=True)
             update_job_status(job_id, "error", error=str(e))
-            app.socketio.emit("processing_error", {"job_id": job_id, "error": str(e), "timestamp": datetime.now().isoformat()})
+            try:
+                app.socketio.emit("processing_error", {"job_id": job_id, "error": str(e), "timestamp": datetime.now().isoformat()})
+            except Exception as emit_error:
+                app.logger.warning(f"SocketIO emit failed (processing_error): {emit_error}")
         finally:
             # Clean up the uploaded file in any case (success or error)
             cleanup_file(app, filepath)
