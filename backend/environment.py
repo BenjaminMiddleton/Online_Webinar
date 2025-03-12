@@ -61,9 +61,9 @@ class Environment:
         """
         # Check commonly used environment variables for host URL
         for env_var in [
+            "RENDER_EXTERNAL_URL",  # Prioritize RENDER_EXTERNAL_URL
             "HOST_URL",
             "RAILWAY_STATIC_URL",
-            "RENDER_EXTERNAL_URL", 
             "VERCEL_URL",
             "HEROKU_APP_URL"
         ]:
@@ -71,6 +71,7 @@ class Environment:
                 # Ensure URL has proper protocol
                 if not url.startswith(("http://", "https://")):
                     url = f"https://{url}"
+                logger.info(f"Detected host URL from {env_var}: {url}")  # Add logging
                 return url
                 
         # In local environment, try to determine local IP
@@ -90,6 +91,7 @@ class Environment:
                 # If can't determine local IP
                 return "http://localhost:5000"
                 
+        logger.warning("Could not determine host URL")  # Add logging
         return None
         
     @staticmethod
