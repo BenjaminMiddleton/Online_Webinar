@@ -37,7 +37,7 @@ python -m venv venv
 
 On Linux and Mac: source venv/bin/activate
 On Windows CMD: venv\Scripts\activate.bat
-On Windows Powershell: venv\Scripts\activate.psl
+On Windows Powershell: venv\Scripts\Activate.psl
 
 # Install dependencies
 pip install -r requirements.txt
