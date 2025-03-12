@@ -1,0 +1,162 @@
+.title {
+    margin: 0;
+    flex: 1;
+    position: relative;
+    font-size: inherit;
+    font-weight: 700; /* Ensure font weight is 700 for all interactions */
+    font-family: inherit;
+    color: inherit; /* Ensure color matches */
+  }
+  
+  .lockIcon {
+    height: 34px;
+    width: 26px;
+    position: relative;
+    cursor: pointer;
+    transition: fill 0.2s ease;
+  }
+  
+  .lockIconHovered path {
+    fill: #A2A2A2;
+  }
+  
+  .lockIconClicked path {
+    fill: #838383;
+  }
+  
+  .lockIconDefault path {
+    fill: #F8F8F8;
+  }
+  
+  .lockattendees {
+    display: flex;
+    flex-direction: row;
+    align-items: flex-start;
+    justify-content: flex-end;
+    gap: var(--gap-3xs);
+  }
+  
+  .title1 {
+    align-self: stretch;
+    border-radius: var(--br-2xs);
+    background-color: var(--color-whitesmoke-100);
+    overflow: hidden;
+    display: flex;
+    flex-direction: row;
+    align-items: flex-start;
+    justify-content: flex-end;
+    padding: var(--padding-3xs);
+    gap: var(--gap-2xs);
+    width: 100% !important;
+    min-width: initial !important;
+    max-width: none !important;
+    box-sizing: border-box;
+    margin: 0; /* Ensure consistent margin */
+  }
+  
+  /* Hover state */
+  .title1:hover {
+    background-color: #93CCD7;
+    color: #F8F8F8;
+  }
+  
+  /* Press (active) state */
+  .title1:active {
+    background-color: #6EAFC9;
+    box-shadow: 0px 4px 6.3px 0px rgba(0, 0, 0, 0.12) inset;
+    color: #F8F8F8;
+  }
+  
+  .timeInput {
+    margin-right: var(--gap-2xs);
+    font-size: inherit;
+    font-weight: 700; /* Ensure font weight is 700 */
+    font-family: inherit;
+    color: inherit; /* Ensure color matches */
+    background: transparent;
+    border: none;
+    outline: none;
+    width: 50px; /* Adjust width as needed */
+    text-align: center;
+  }
+
+  /* Time and Record Button Styles */
+  .timeRecordContainer {
+    display: flex;
+    width: 116px;
+    align-items: center;
+    gap: 7px;
+    flex-shrink: 0;
+    align-self: stretch;
+  }
+  
+  .timeContainer {
+    display: flex;
+    width: 87px;
+    flex-direction: column;
+    justify-content: center;
+    flex-shrink: 0;
+    align-self: stretch;
+  }
+  
+  .timeDisplay {
+    color: #444;
+    font-family: Montserrat;
+    font-size: 28px;
+    font-style: normal;
+    font-weight: 600;
+    line-height: normal;
+  }
+  
+  /* Add hover and active states for time display */
+  .title1:hover .timeDisplay {
+    color: #F8F8F8; /* Change text color to white on hover */
+  }
+  
+  .title1:active .timeDisplay {
+    color: #F8F8F8; /* Change text color to white on press */
+  }
+
+  .recordButtonContainer {
+    display: flex;
+    width: 22px;
+    height: 22px;
+    justify-content: center;
+    align-items: center;
+    flex-shrink: 0;
+  }
+  
+  .recordButton {
+    width: 22px;
+    height: 22px;
+    background-color: #F75F9C;
+    border-radius: 50%;
+    cursor: pointer;
+    position: relative;
+    box-sizing: border-box;
+    border: 4px solid #F8F8F8;
+    /* Remove transition for immediate animation */
+  }
+
+  .recordButton:hover {
+    background-color: #BEBEBE;
+  }
+
+  .recordButton:active {
+    background-color: #D9D9D9;
+  }
+
+  /* Add toggled state style */
+  .recordButtonToggled {
+    background-color: #F8F8F8;
+  }
+
+  /* When hovering on toggled button */
+  .recordButtonToggled:hover {
+    background-color: #CA4D7F;
+  }
+
+  /* When pressing on toggled button */
+  .recordButtonToggled:active {
+    background-color: #A0A0A0;
+  }

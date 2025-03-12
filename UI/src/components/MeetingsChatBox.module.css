@@ -1,0 +1,204 @@
+.bigArrowRight {
+    cursor: pointer;
+    border: none;
+    background-color: transparent;
+    height: 100%;
+    width: 100%;
+  }
+  .bigArrowRight1 {
+    cursor: pointer;
+    border: none;
+    padding: 0;
+    background-color: transparent;
+    height: 59px; /* Ensure the arrow remains full-sized */
+    width: 58px; /* Ensure the arrow remains full-sized */
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .chatTitle {
+    margin: 0;
+    align-self: stretch;
+    width: 109px;
+    position: relative;
+    font-size: inherit;
+    font-weight: 500;
+    font-family: inherit;
+    display: flex;
+    align-items: center;
+  }
+  .chatTitle1 {
+    align-self: stretch;
+    flex: 1;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: flex-end;
+  }
+  .header {
+    width: 100%;
+    height: 59px;
+    border-radius: var(--br-2xs) var(--br-2xs) 0px 0px;
+    background: linear-gradient(180deg, #A2A2A2, var(--color-silver) 65%);
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    padding: var(--padding-3xs) var(--padding-lg) var(--padding-3xs) 0px;
+    box-sizing: border-box;
+    gap: var(--gap-0);
+  }
+  
+  .chatBox[data-collapsed="true"] .header {
+    padding: 0; /* Remove padding in the collapsed version */
+  }
+  
+  .chatResponse {
+    border: none;
+    background-color: transparent;
+    font-family: var(--font-montserrat);
+    font-size: var(--font-size-9xl);
+    width: 100%; /* Ensure it fills the width of its container */
+    flex: 1;
+    position: relative;
+    color: var(--color-darkslategray-100);
+    text-align: left;
+    display: flex;
+    align-items: flex-end;
+    white-space: pre-wrap; /* Ensure text wraps */
+    overflow-wrap: break-word; /* Ensure long words break */
+    padding: var(--padding-3xs); /* Add padding to match a textarea */
+  }
+  .chatResponseBox {
+    align-self: stretch;
+    flex: 1;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+  }
+  .replyBox {
+    align-self: stretch;
+    flex: 1;
+    border-radius: var(--br-2xs);
+    background-color: var(--color-whitesmoke-100);
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    padding: var(--padding-3xs);
+    gap: var(--gap-3xs);
+  }
+  .typeHere {
+    border: none;
+    outline: none;
+    font-family: var(--font-montserrat);
+    font-size: var(--font-size-9xl);
+    background-color: transparent;
+    flex: 1;
+    position: relative;
+    color: #444444;
+    text-align: left;
+    display: inline-block;
+    max-height: 272px;
+  }
+  .typeHere::placeholder {
+    color: rgba(68, 68, 68, 0.47);
+  }
+  .questionText {
+    align-self: stretch;
+    flex: 1;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: flex-start;
+    z-index: 0;
+  }
+  .greyArrowIcon {
+    width: 33px;
+    position: absolute;
+    margin: 0 !important;
+    top: calc(50% - 17px);
+    right: 38px;
+    height: 34px;
+    display: none;
+    z-index: 1;
+  }
+  .questionBox {
+    align-self: stretch;
+    border-radius: var(--br-2xs);
+    background-color: var(--color-whitesmoke-100);
+    display: flex;
+    flex-direction: row;
+    align-items: flex-start;
+    justify-content: flex-start;
+    padding: var(--padding-3xs);
+    box-sizing: border-box;
+    position: relative;
+    gap: var(--gap-3xs);
+    height: 48px;
+    overflow: hidden;
+  }
+  .questionsreplies {
+    width: 100%;
+    flex: 1;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    padding: var(--padding-lg);
+    box-sizing: border-box;
+    gap: var(--gap-lg);
+    border-radius: 0 0 var(--br-2xs) var(--br-2xs); /* Ensure rounded corners at the bottom */
+    height: 100%; /* Ensure the questionsreplies area fills the container */
+  }
+  
+  .chatBox[data-collapsed="true"] .questionsreplies {
+    background-color: #E3E3E3; /* Add background color to the collapsed state */
+  }
+  
+  .collapsedfalse {
+    align-self: stretch;
+    background-color: var(--color-gainsboro-200);
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: flex-start;
+    max-width: 100%;
+    transition: opacity 0.3s ease;
+    flex: 1; /* Ensure the collapsedfalse area fills the container */
+    border-radius: 0 0 var(--br-2xs) var(--br-2xs); /* Ensure rounded corners at the bottom */
+  }
+  .chatBox {
+    align-self: flex-end; /* Ensure the ChatBox collapses to the right */
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    min-width: 0; /* Remove the minimum width */
+    text-align: left;
+    font-size: var(--font-size-23xl);
+    color: var(--color-whitesmoke-100);
+    font-family: var(--font-montserrat);
+    transition: width 0.3s ease, background-color 0.3s ease; /* Add transition for smooth animation */
+    border-radius: var(--br-2xs);
+    height: 100%; /* Ensure the chatBox fills the container */
+    position: relative; /* Change fixed positioning to relative so it stays within the container */
+    bottom: auto; /* Remove the fixed bottom offset */
+  }
+  
+  .chatBox[data-collapsed="true"] {
+    width: 50px;
+    align-self: flex-end; /* Ensure the ChatBox collapses to the right */
+    background-color: #E3E3E3; /* Add background color to the collapsed state */
+    transition: width 0.3s ease, background-color 0.3s ease; /* Ensure transition is applied */
+  }
+  
+  .chatBox[data-collapsed="true"] .bigArrowRight1 {
+    height: 59px; /* Ensure the arrow remains full-sized */
+    width: 58px; /* Ensure the arrow remains full-sized */
+  }

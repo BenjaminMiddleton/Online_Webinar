@@ -14,7 +14,7 @@ export interface MinutesData {
 }
 
 interface ButtonNavBarProps {
-  type: 'arrow' | 'upload' | 'files';
+  type: 'arrow' | 'upload' | 'files' | 'ap' | 'logout' | 'filter' | 'add'; // Updated to include new types
   onClick?: () => void;
   label?: string;
   onFileSelect?: (file: File | null) => void;
@@ -30,17 +30,51 @@ const ArrowIcon: React.FC = () => (
   </svg>
 );
 
-// Upload Icon component
+// Upload Icon component - Updated with new SVG
 const UploadIcon: React.FC = () => (
   <svg width="40" height="40" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
-    <g clipPath="url(#clip0_11218_6537)">
-      <path fillRule="evenodd" clipRule="evenodd" d="M5 5H18L18 7L18 9H9L9 31H31L31 22H35L35 35H5V5ZM23 5.2H35.03L35.03 17H33.015H31L31 11.5L20.6875 21.3125L18 18.5L28.5 9H23L23 5.2Z" fill="#F8F8F8"/>
+    <g clip-path="url(#clip0_11218_6537)">
+      <path fill-rule="evenodd" clip-rule="evenodd" d="M5 5H18L18 7L18 9H9L9 31H31L31 22H35L35 35H5V5ZM23 5.2H35.03L35.03 17H33.015H31L31 11.5L20.6875 21.3125L18 18.5L28.5 9H23L23 5.2Z" fill="#F8F8F8"/>
     </g>
     <defs>
       <clipPath id="clip0_11218_6537">
         <rect width="40" height="40" fill="white"/>
       </clipPath>
     </defs>
+  </svg>
+);
+
+// Action Points (AP) Icon component - Updated to ensure circles have holes
+const APIcon: React.FC = () => (
+  <svg width="40" height="40" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <path d="M20 11.5C22.3472 11.5 24.25 9.59719 24.25 7.24998C24.25 4.90276 22.3472 2.99997 20 2.99997C17.6528 2.99997 15.75 4.90276 15.75 7.24998C15.75 9.59719 17.6528 11.5 20 11.5Z" stroke="#F8F8F8" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+    <path d="M16.9401 10.31L10.3101 16.94" stroke="#F8F8F8" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"/>
+    <path d="M7.25001 24.25C9.59723 24.25 11.5 22.3472 11.5 20C11.5 17.6528 9.59723 15.75 7.25001 15.75C4.90279 15.75 3 17.6528 3 20C3 22.3472 4.90279 24.25 7.25001 24.25Z" stroke="#F8F8F8" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+    <path d="M11.4998 20H28.4998" stroke="#F8F8F8" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"/>
+    <path d="M32.75 24.25C35.0972 24.25 37 22.3472 37 20C37 17.6528 35.0972 15.75 32.75 15.75C30.4028 15.75 28.5 17.6528 28.5 20C28.5 22.3472 30.4028 24.25 32.75 24.25Z" stroke="#F8F8F8" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+    <path d="M23.0601 29.69L29.6901 23.06" stroke="#F8F8F8" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"/>
+    <path d="M20 37C22.3472 37 24.25 35.0973 24.25 32.75C24.25 30.4028 22.3472 28.5 20 28.5C17.6528 28.5 15.75 30.4028 15.75 32.75C15.75 35.0973 17.6528 37 20 37Z" stroke="#F8F8F8" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  </svg>
+);
+
+// LogOut Icon component
+const LogOutIcon: React.FC = () => (
+  <svg width="40" height="40" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <path d="M30.26 6.45412L26.9975 9.69529C28.98 10.8814 30.6204 12.5563 31.7596 14.5576C32.8989 16.5588 33.4984 18.8185 33.5 21.1176C33.5 24.6747 32.0777 28.086 29.5459 30.6012C27.0142 33.1164 23.5804 34.5294 20 34.5294C16.4196 34.5294 12.9858 33.1164 10.4541 30.6012C7.92233 28.086 6.50001 24.6747 6.50001 21.1176C6.50001 16.2671 9.11001 12.0424 12.98 9.67294L9.74001 6.45412C7.35014 8.09198 5.39689 10.2825 4.04854 12.837C2.70019 15.3914 1.99716 18.2333 2.00001 21.1176C2.00001 25.8603 3.89643 30.4088 7.27209 33.7624C10.6477 37.116 15.2261 39 20 39C24.7739 39 29.3523 37.116 32.7279 33.7624C36.1036 30.4088 38 25.8603 38 21.1176C38 15.0376 34.94 9.67294 30.26 6.45412ZM22.25 1H17.75V23.3529H22.25" fill="#F8F8F8"/>
+  </svg>
+);
+
+// Filter Icon component
+const FilterIcon: React.FC = () => (
+  <svg width="40" height="40" viewBox="0 0 333 333" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <path style={{fill:"#F8F8F8"}} d="m 258.60914,283.10918 -29.87972,-29.89217 -7.57901,4.94763 C 182.6985,283.26632 133.71945,286.023 92.635261,265.39785 61.664636,249.84992 38.591296,222.88363 27.694313,189.5 19.216406,163.52737 19.570101,133.01655 28.641806,107.76633 35.460736,88.786492 45.207969,73.560654 59.894506,58.947494 78.840085,40.096572 99.622264,28.905794 126,23.351038 c 11.91313,-2.508727 37.30976,-2.521828 49,-0.02528 27.42873,5.857644 50.14923,18.492605 69.07452,38.41263 40.88834,43.037458 47.15738,107.292458 15.36147,157.448488 l -5.71758,9.01912 29.88522,29.89767 29.88522,29.89768 -12.5,12.5 -12.5,12.5 z M 174.5,241.09863 c 16.69783,-4.42272 31.93396,-13.50671 44.05323,-26.26515 C 235.75649,196.72293 244,175.75488 244,150.10753 244,125.78748 237.09664,107.0692 221.13001,88.096119 210.24889,75.166123 190.46977,63.281588 172.49308,58.872004 159.91061,55.785594 141.13226,55.78054 128.5,58.860165 93.250553,67.453642 65.891079,95.76639 58.588231,131.20784 c -1.817665,8.82131 -2.087862,26.604 -0.537251,35.3585 6.672763,37.67331 35.169588,67.18057 72.94902,75.53562 11.46115,2.53467 31.92435,2.06269 43.5,-1.00333 z" />
+  </svg>
+);
+
+// Add Icon component
+const AddIcon: React.FC = () => (
+  <svg width="40" height="40" viewBox="0 0 333 333" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <path style={{fill:"#F8F8F8"}} d="M 144,240 V 189 H 93 42 V 166.5 144 h 51 51 V 93 42 h 22.5 22.5 v 51 51 h 51 51 v 22.5 22.5 h -51 -51 v 51 51 H 166.5 144 Z" />
   </svg>
 );
 
@@ -53,13 +87,8 @@ interface FilesIconProps {
   onNewJobCreated?: (jobId: string, jobData?: any) => void;
 }
 
-const FilesIcon: React.FC<FilesIconProps> = ({
-  onFileSelect,
-  onClick,
-  onProcessingComplete,
-  onProcessingError,
-  onNewJobCreated
-}) => {
+// Files Icon component implementation
+const FilesIcon: React.FC<FilesIconProps> = ({ onFileSelect, onClick, onProcessingComplete, onProcessingError, onNewJobCreated }) => {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [uploading, setUploading] = useState<boolean>(false);
   const [jobId, setJobId] = useState<string | null>(null);
@@ -292,6 +321,10 @@ const iconComponents: Record<ButtonNavBarProps['type'], React.FC<any>> = {
   arrow: ArrowIcon,
   upload: UploadIcon,
   files: FilesIcon,
+  ap: APIcon,
+  logout: LogOutIcon,
+  filter: FilterIcon,
+  add: AddIcon
 };
 
 const ButtonNavBar: React.FC<ButtonNavBarProps> = ({ 

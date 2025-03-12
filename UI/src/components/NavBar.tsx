@@ -6,11 +6,13 @@ import styles from "./NavBar.module.css";
 export type NavBarType = {
   className?: string;
   onNewJobCreated?: (jobId: string, jobData?: any) => void;
+  onArrowClick?: () => void; // Added prop for arrow button navigation
 };
 
 const NavBar: FunctionComponent<NavBarType> = ({
   className = "",
   onNewJobCreated,
+  onArrowClick,
 }) => {
   // Handle processing completion
   const handleProcessingComplete = (minutes: any) => {
@@ -23,15 +25,18 @@ const NavBar: FunctionComponent<NavBarType> = ({
   return (
     <header className={[styles.navBar, className].join(" ")}>
       <div className={styles.navIcons}>
-        {/* First button with ArrowIcon */}
-        <ButtonNavBar type="arrow" onClick={() => {}} />
-        {/* Second button with FilesIcon */}
+        {/* Pass the onArrowClick handler to the arrow button */}
+        <ButtonNavBar type="arrow" onClick={onArrowClick} />
+        
+        {/* Files button for uploads */}
         <ButtonNavBar 
           type="files" 
           onClick={() => {}}
-          onNewJobCreated={onNewJobCreated}  // Pass the callback directly to let job data flow up
+          onProcessingComplete={handleProcessingComplete}
+          onNewJobCreated={onNewJobCreated}
         />
-        {/* Third button replaced with UploadIcon version */}
+        
+        {/* Upload button */}
         <ButtonNavBar type="upload" onClick={() => {}} />
       </div>
       <AppTitle />

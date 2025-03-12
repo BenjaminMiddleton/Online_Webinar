@@ -1,14 +1,11 @@
 import React, { FunctionComponent, useState, useEffect } from "react";
-import NavBar from "../components/NavBar";
-import MinutesBox from "../components/MinutesBox";
-import TranscriptBox from "../components/TranscriptBox";
-import ChatBox from "../components/ChatBox";
-import styles from "./MinutesFrame.module.css";
+import MeetingsNavBar from "../components/MeetingsNavBar";
+import MeetingsBox from "../components/MeetingsBox";
+import MeetingsChatBox from "../components/MeetingsChatBox";
+import styles from "./MeetingsFrame.module.css";
 import { getLastJobData, joinJobRoom } from "../api/apiService";
-import { useNavigate } from "react-router-dom";
 
-const MinutesFrame: FunctionComponent = () => {
-  const navigate = useNavigate();
+const MeetingsFrame: FunctionComponent = () => {
   const [leftWidth, setLeftWidth] = useState(50); // Initial width percentage for the left container
   const [isRightCollapsed, setIsRightCollapsed] = useState(true);
   const [activeJobId, setActiveJobId] = useState<string | null>(null);
@@ -41,7 +38,7 @@ const MinutesFrame: FunctionComponent = () => {
           })
           .then(data => {
             console.log('Fetched job data:', data);
-            if (data.status === 'completed' && data.minutes) {
+            if (data.status === 'completed' && data.meetings) { // Changed from data.minutes to data.meetings
               setJobData(data);
 
               // Also store in localStorage for better persistence
@@ -148,16 +145,34 @@ const MinutesFrame: FunctionComponent = () => {
     );
   };
 
-  // Navigation function to MeetingsFrame
-  const handleNavigateToMeetings = () => {
-    navigate("/meetings");
+  const handleLogout = () => {
+    console.log("Logout button clicked");
+    // Implement logout functionality here
+  };
+
+  const handleActionPoints = () => {
+    console.log("Action Points button clicked");
+    // Implement action points functionality here
+  };
+
+  const handleFilter = () => {
+    console.log("Filter button clicked");
+    // Implement filter functionality here
+  };
+
+  const handleAdd = () => {
+    console.log("Add button clicked");
+    // Implement add new meeting functionality here
   };
 
   return (
-    <div className={styles.minutesFrame}>
-      <NavBar 
+    <div className={styles.meetingsFrame}>
+      <MeetingsNavBar 
         onNewJobCreated={handleNewJobCreated}
-        onArrowClick={handleNavigateToMeetings}
+        onLogout={handleLogout}
+        onActionPoints={handleActionPoints}
+        onFilter={handleFilter}
+        onAdd={handleAdd}
       />
       {loading && (
         <div className={styles.loadingOverlay}>
@@ -181,16 +196,10 @@ const MinutesFrame: FunctionComponent = () => {
           className={styles.leftContainer} 
           style={{ width: `${leftWidth}%` }}
         >
-          <MinutesBox 
+          <MeetingsBox 
             property1="Expanded" 
             jobId={activeJobId}
             jobData={jobData} 
-          />
-          <TranscriptBox 
-            property1="Expanded" 
-            jobId={activeJobId}
-            transcription={jobData?.minutes?.transcription}
-            speakers={jobData?.minutes?.speakers} 
           />
           <div className={styles.transparentFrame}></div>
         </div>
@@ -204,7 +213,7 @@ const MinutesFrame: FunctionComponent = () => {
           style={isRightCollapsed ? { width: '50px' } : { width: `${100 - leftWidth}%` }}
           data-collapsed={isRightCollapsed}
         >
-          <ChatBox 
+          <MeetingsChatBox 
             collapsed={false} 
             className={styles.chatBox} 
             onCollapseChange={handleChatCollapseChange}
@@ -215,4 +224,4 @@ const MinutesFrame: FunctionComponent = () => {
   );
 };
 
-export default MinutesFrame;
+export default MeetingsFrame;

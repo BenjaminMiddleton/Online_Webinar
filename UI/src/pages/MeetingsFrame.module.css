@@ -1,0 +1,250 @@
+.meetings {
+  align-self: stretch;
+  flex: 2;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: flex-start;
+  gap: var(--gap-lg);
+}
+.chatContainer {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  max-width: 100%;
+  flex: 1;
+  gap: var(--gap-lg);
+}
+.contentArea {
+  align-self: stretch;
+  flex: 1;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: row;
+  align-items: flex-start;
+  justify-content: center;
+  gap: var(--gap-lg);
+  max-width: 100%;
+  padding: var(--padding-lg);
+  box-sizing: border-box;
+  margin-top: 59px; /* Add margin to account for the fixed header */
+}
+.meetingsFrame {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  width: 100%;
+  overflow: hidden;
+}
+
+.mainContent {
+  display: flex;
+  gap: 0; /* Remove gap between containers */
+  padding: 0 24px 0px 24px; /* Remove top padding */
+  flex: 1;
+  min-height: 0;
+}
+
+.leftContainer {
+  display: flex;
+  flex-direction: column;
+  gap: 40px;
+  flex: 1 1 auto;
+  min-width: 550px;
+  overflow-y: auto;
+  position: relative;
+  
+  /* Firefox scrollbar styles */
+  scrollbar-width: thin; /* Use thin for overlay effect */
+  scrollbar-color: transparent transparent;
+}
+
+/* WebKit/Blink browsers (Chrome, Edge, Safari) scrollbar styles */
+.leftContainer::-webkit-scrollbar {
+  width: 8px; /* Slightly narrower for overlay effect */
+}
+
+.leftContainer::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.leftContainer::-webkit-scrollbar-thumb {
+  background-color: transparent;
+  border-radius: 8px;
+}
+
+/* Show scrollbar thumb on hover */
+.leftContainer:hover::-webkit-scrollbar-thumb {
+  background-color: rgba(150, 150, 150, 0.5);
+  border-radius: 8px;
+}
+
+.leftContainer:hover {
+  scrollbar-color: rgba(150, 150, 150, 0.5) transparent; /* Firefox hover scrollbar color */
+}
+
+.transparentFrame {
+  width: 100%;
+  height: 24px; /* Ensure the height is exactly 24px */
+  background-color: transparent;
+  margin: 0; /* Remove any extra margin */
+  padding: 0; /* Remove any extra padding */
+  margin-top: -16px; /* Adjust to ensure the gap is 24px */
+}
+
+.resizer {
+  width: 40px; /* Set the width to 40px */
+  height: 60px; /* Set the height to 60px */
+  cursor: col-resize;
+  position: relative;
+  z-index: 1;
+  border-radius: 3px; /* Add rounded ends */
+  margin: auto 0; /* Center the resizer vertically */
+}
+
+.resizer::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 50%;
+  width: 4px; /* Set the visible line width to 4px */
+  height: 60px; /* Set the height to 60px */
+  background-color: #ccc;
+  border-radius: 3px; /* Add rounded ends */
+  transform: translateX(-50%);
+}
+
+.spacer {
+  width: 40px; /* Same width as the resizer */
+  flex: 0 0 40px; /* Don't grow or shrink, maintain exact width */
+}
+
+.rightContainer {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  flex: 0 1 auto; /* Allow the right container to hug the ChatBox */
+  min-width: 500px; /* Set a minimum width for the right container */
+  max-width: calc(100% - 300px); /* Adjust max-width to account for the left container's minimum width */
+  padding-bottom: 24px; /* Add 24px padding to bottom */
+}
+
+.rightContainer[data-collapsed="true"] {
+  min-width: 50px !important;
+  max-width: 50px;
+}
+
+.chatBox {
+  flex: 0 1 auto; /* Allow the ChatBox to control the size of the right container */
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: stretch;
+  height: 100%; /* Ensure the ChatBox fills the container */
+  width: 100%; /* Ensure the ChatBox fills the container horizontally */
+  position: relative; /* Ensure it stays within the container */
+}
+
+.header {
+  width: 100%;
+  height: 59px;
+  background: linear-gradient(180deg, #A2A2A2, var(--color-silver) 65%);
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--padding-3xs) var(--padding-lg) var(--padding-3xs) 0px;
+  box-sizing: border-box;
+  gap: var(--gap-0);
+  position: fixed; /* Pin to the top */
+  top: 0;
+  left: 0;
+  right: 0;
+  border-radius: 0; /* Remove curved corners */
+}
+
+.loadingOverlay {
+  position: fixed;
+  top: 60px; /* Below the navbar */
+  left: 0;
+  right: 0;
+  background: rgba(0, 0, 0, 0.7);
+  color: white;
+  padding: 10px;
+  text-align: center;
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+}
+
+.loadingSpinner {
+  width: 20px;
+  height: 20px;
+  border: 3px solid rgba(255, 255, 255, 0.3);
+  border-radius: 50%;
+  border-top-color: #fff;
+  animation: spin 1s ease-in-out infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+.errorBanner {
+  position: fixed;
+  top: 60px; /* Below the navbar */
+  left: 0;
+  right: 0;
+  background: #ff5252;
+  color: white;
+  padding: 10px 20px;
+  text-align: center;
+  z-index: 1000;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.dismissButton {
+  background: none;
+  border: none;
+  color: white;
+  font-size: 16px;
+  cursor: pointer;
+  padding: 0 5px;
+}
+
+@media screen and (max-width: 1400px) {
+  .chatContainer {
+    flex: 1;
+  }
+
+  .contentArea {
+    flex-wrap: wrap;
+  }
+}
+@media screen and (max-width: 825px) {
+  .meetings {
+    gap: var(--gap-xl);
+    min-width: 100%;
+  }
+
+  .chatContainer {
+    min-width: 100%;
+  }
+
+  .contentArea {
+    gap: var(--gap-xl);
+  }
+}
+@media screen and (max-width: 450px) {
+  .meetingsFrame {
+    gap: var(--gap-xl);
+  }
+}

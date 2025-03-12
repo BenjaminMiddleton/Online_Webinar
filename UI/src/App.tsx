@@ -6,6 +6,7 @@ import {
   useLocation,
 } from "react-router-dom";
 import MinutesFrame from "./pages/MinutesFrame";
+import MeetingsFrame from "./pages/MeetingsFrame";
 import UploadTest from "./components/UploadTest"; // Import the test component
 
 function App() {
@@ -28,6 +29,10 @@ function App() {
         title = "Minutes Frame";
         metaDescription = "View and manage your minutes.";
         break;
+      case "/meetings":
+        title = "Meetings Frame";
+        metaDescription = "View and manage your meetings.";
+        break;
       case "/action-points":
         title = "Action Points";
         metaDescription = "Manage your action points.";
@@ -48,7 +53,7 @@ function App() {
 
     if (metaDescription) {
       const metaDescriptionTag: HTMLMetaElement | null = document.querySelector(
-        'head > meta[name="description"]',
+        'head > meta[name="description"]'
       );
       if (metaDescriptionTag) {
         metaDescriptionTag.content = metaDescription;
@@ -57,13 +62,11 @@ function App() {
   }, [pathname]);
 
   return (
-    <div className="scale-container">
-      <Routes>
-        <Route path="/" element={<MinutesFrame />} />
-        <Route path="/action-points" element={<MinutesFrame />} />
-        <Route path="/upload-test" element={<UploadTest />} /> {/* Add the test route */}
-      </Routes>
-    </div>
+    <Routes>
+      <Route path="/" element={<MinutesFrame />} />
+      <Route path="/meetings" element={<MeetingsFrame />} />
+      <Route path="/upload-test" element={<UploadTest />} />
+    </Routes>
   );
 }
 
