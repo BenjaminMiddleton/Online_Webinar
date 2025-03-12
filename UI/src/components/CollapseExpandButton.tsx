@@ -17,13 +17,13 @@ const CollapseExpandButton: FunctionComponent<CollapseExpandButtonProps> = ({
     >
       <svg 
         className={styles.collapseArrowIcon} 
-        width="24" 
-        height="24" 
-        viewBox="0 0 24 24" 
+        width="68" 
+        height="59" 
+        viewBox="0 0 68 59" 
         xmlns="http://www.w3.org/2000/svg"
       >
         <path 
-          d={isCollapsed ? "M12 16l-6-6h12z" : "M12 8l6 6H6z"} 
+          d="M18.0249 23.2201L34.0124 38.7134L49.9999 23.2201L47.0856 20.2864L34.0124 32.9554L20.9393 20.2864L18.0249 23.2201Z" 
           fill="#F8F8F8" 
         />
       </svg>

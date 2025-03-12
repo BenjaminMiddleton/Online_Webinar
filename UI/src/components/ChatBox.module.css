@@ -59,7 +59,6 @@
   background-color: transparent;
   font-family: var(--font-montserrat);
   font-size: var(--font-size-9xl);
-  outline: 1px solid green; /* Add 1px outline */
   width: 100%; /* Ensure it fills the width of its container */
   flex: 1;
   position: relative;
