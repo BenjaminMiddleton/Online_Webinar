@@ -1,4 +1,7 @@
+import sys
 import os
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+
 import uuid
 import logging
 from flask import Flask, request, jsonify, send_file, current_app
@@ -97,10 +100,19 @@ def create_app(config=None):
     else:
         app.config.from_object(Config())
     
-    # Set up CORS – allow common localhost origins for development
+    # Set up CORS – allow common origins
+    # Determine allowed origins based on environment
+    let_origins = os.environ.get("CORS_ALLOWED_ORIGINS")
+    if let_origins:
+        allowed_origins = [o.strip() for o in let_origins.split(",") if o.strip()]
+    elif Environment.is_local():
+        allowed_origins = ["http://localhost:5173", "http://127.0.0.1:5173"]
+    else:
+        allowed_origins = ["https://production.example.com"]  # Replace with your production domain
+
     CORS(app, resources={
         r"/*": {
-            "origins": ["http://localhost:5173", "http://127.0.0.1:5173", "*"],
+            "origins": allowed_origins,
             "methods": ["GET", "POST", "OPTIONS"],
             "allow_headers": ["Content-Type", "Authorization"],
             "supports_credentials": False
@@ -127,18 +139,12 @@ def create_app(config=None):
     # Set up rate limiting
     limiter = Limiter(app=app, key_func=get_remote_address)
 
-    # Initialize Socket.IO with allowed origins from env or fallback
-    allowed_origins = [o.strip() for o in os.environ.get("CORS_ALLOWED_ORIGINS", "").split(",") if o.strip()]
-    if not allowed_origins:
-        allowed_origins = ["*"] if app.config.get("DEBUG", True) else ["https://production.example.com"]
+    # Initialize Socket.IO with allowed origins determined dynamically
     socketio = SocketIO(
         app,
         cors_allowed_origins=allowed_origins,
         async_mode='threading',
-        logger=False,
-        engineio_logger=False,
-        ping_timeout=60,
-        ping_interval=25
+        transports=['websocket', 'polling']
     )
     app.socketio = socketio
 

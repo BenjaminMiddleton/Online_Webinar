@@ -40,11 +40,13 @@ let socket!: Socket;
 export function getSocket() {
   if (!socket) {
     socket = io(SOCKET_URL, {
-      transports: ['websocket', 'polling'],
+      path: '/socket.io',
+      transports: ['polling'], // Force polling transport only
       reconnection: true,
       reconnectionAttempts: 10,
       reconnectionDelay: 1000,
-      timeout: 20000
+      timeout: 20000,
+      upgrade: false    // Disable upgrade to WebSocket
     });
     
     // Set up default listeners for logging/debugging
@@ -98,7 +100,12 @@ export async function getJobStatus(jobId: string): Promise<JobResponse> {
     return await response.json();
   } catch (error) {
     console.error('Error fetching job status:', error);
-    throw error;
+    // Return a default error response so consuming code can handle it gracefully.
+    return {
+      status: "error",
+      job_id: jobId,
+      error: "Backend server not available. Ensure it is running."
+    };
   }
 }
 

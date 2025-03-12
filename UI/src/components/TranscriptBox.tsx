@@ -1,4 +1,4 @@
-import React, { FunctionComponent, useState, useEffect } from "react";
+import React, { FunctionComponent, useState, useEffect, useRef } from "react";
 import { CSSTransition } from "react-transition-group";
 import CollapseExpandButton from "./CollapseExpandButton";
 import styles from "./TranscriptBox.module.css";
@@ -29,6 +29,7 @@ const TranscriptBox: React.FC<TranscriptBoxType> = ({
   const [loading, setLoading] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [loadError, setLoadError] = useState<string | null>(null);
+  const hasLogged = useRef(false);
 
   // Enhanced useEffect for better error handling
   useEffect(() => {
@@ -44,18 +45,20 @@ const TranscriptBox: React.FC<TranscriptBoxType> = ({
     
     // If no transcription provided but we have a jobId, fetch from API
     if (jobId && !transcription) {
+      let pollInterval: ReturnType<typeof setInterval>; // declare pollInterval outside fetchTranscript
       const fetchTranscript = async () => {
         try {
           setIsLoading(true);
           setLoadError(null); // Clear any previous errors
           
-          console.log(`TranscriptBox: Fetching data for job ${jobId}`);
+          if (!hasLogged.current) {
+            console.log(`TranscriptBox: Fetching data for job ${jobId}`);
+            hasLogged.current = true;
+          }
           const result = await getJobStatus(jobId);
-          console.log('TranscriptBox: Received job data', result);
           
           if (result.status === 'completed' && result.minutes) {
             if (result.minutes.transcription) {
-              console.log('TranscriptBox: Setting transcript from job data');
               setTranscript(result.minutes.transcription);
             } else {
               setLoadError('No transcript available in the job data');
@@ -64,11 +67,14 @@ const TranscriptBox: React.FC<TranscriptBoxType> = ({
             if (result.minutes.speakers && result.minutes.speakers.length > 0) {
               setSpeakerList(result.minutes.speakers);
             }
+            // Stop polling when job is finished
+            clearInterval(pollInterval);
           } else if (result.status === 'processing') {
             setLoadError('Job is still processing. Please wait...');
           } else if (result.status === 'error') {
             console.error('TranscriptBox: Job error:', result.error);
             setLoadError(`Error: ${result.error || 'Unknown error occurred'}`);
+            clearInterval(pollInterval);
           }
         } catch (error) {
           console.error("Failed to fetch transcript data:", error);
@@ -78,7 +84,10 @@ const TranscriptBox: React.FC<TranscriptBoxType> = ({
         }
       };
       
+      // Fetch immediately and then poll every 10 seconds
       fetchTranscript();
+      pollInterval = setInterval(fetchTranscript, 10000);
+      return () => clearInterval(pollInterval);
     }
   }, [transcription, speakers, jobId]);
 
