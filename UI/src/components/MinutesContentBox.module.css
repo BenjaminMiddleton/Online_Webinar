@@ -10,6 +10,18 @@
   height: 34px;
   width: 26px;
   position: relative;
+  cursor: pointer;
+  transition: fill 0.2s ease;
+}
+.lockIconHovered path {
+  fill: #A2A2A2;
+}
+.lockIconClicked path {
+  fill: #838383;
+}
+/* Add class for hover on clicked state */
+.lockIconDefault path {
+  fill: #F8F8F8;
 }
 .lockattendees {
   display: flex;
