@@ -34,7 +34,10 @@ cd Meeting-Management-Project
 ```bash
 # Create and activate a virtual environment (recommended)
 python -m venv venv
-source venv/bin/activate  # On Windows: venv\Scripts\activate
+
+On Linux and Mac: source venv/bin/activate
+On Windows CMD: venv\Scripts\activate.bat
+On Windows Powershell: venv\Scripts\Activate.psl
 
 # Install dependencies
 pip install -r requirements.txt
