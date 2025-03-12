@@ -24,7 +24,9 @@ RUN pip install --no-cache-dir -r requirements.txt
 COPY . .
 
 # Install Node.js and npm
-RUN apt-get update && apt-get install -y nodejs npm
+RUN apt-get update && apt-get install -y curl && \
+    curl -fsSL https://deb.nodesource.com/setup_18.x | bash - && \
+    apt-get install -y nodejs
 
 # Build the React UI
 WORKDIR ${APP_HOME}/UI
