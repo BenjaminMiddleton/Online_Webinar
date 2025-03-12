@@ -61,7 +61,14 @@ SECRET_KEY=your_secret_key
 UPLOAD_FOLDER=uploads
 FLASK_DEBUG=false
 LOG_LEVEL=INFO
-OPENAI_MODEL=o3-mini
+OPENAI_MODEL=gpt-4o
+
+# File Cleanup Settings
+COMPLETED_JOB_RETENTION_HOURS=24
+INTERRUPTED_JOB_RETENTION_MINUTES=30
+ENABLE_SCHEDULED_CLEANUP=true
+ENABLE_IMMEDIATE_UPLOADS_CLEANUP=true
+CLEANUP_INTERVAL_HOURS=4.0
 
 # Optional Azure Storage (if using cloud storage)
 AZURE_STORAGE_CONNECTION_STRING=your_azure_storage_connection_string
@@ -70,7 +77,24 @@ AZURE_CONTAINER_NAME=meeting-uploads
 
 ## Running the Application
 
-### 1. Start the backend server
+### Option 1: Unified Development Server (Recommended for Local Development)
+
+Run both backend and frontend with a single command:
+
+```bash
+# From the project root
+python run_dev.py
+```
+
+This script will:
+- Start the Flask backend server on port 5000
+- Start the Vite development server for the UI on port 5173
+- Open your browser to the application automatically
+- Show backend and frontend logs in the terminal
+
+### Option 2: Run Backend and Frontend Separately
+
+#### 1. Start the backend server
 
 From the project root:
 
@@ -82,7 +106,7 @@ python backend/app.py
 gunicorn -w 2 -t 120 --chdir backend app:app
 ```
 
-### 2. Start the frontend development server
+#### 2. Start the frontend development server
 
 In a separate terminal:
 
@@ -134,6 +158,27 @@ To deploy the React UI to GitHub Pages, follow these steps:
    npm run deploy
    ```
 4. Your UI will be available at the URL specified in the homepage field.
+
+## Maintenance
+
+### Automatic File Cleanup
+
+The system includes automated cleanup of temporary files to prevent disk space issues:
+
+1. **Scheduled Cleanup**: Runs every 4 hours (configurable via `CLEANUP_INTERVAL_HOURS`)
+   - Removes completed jobs older than 24 hours (configurable via `COMPLETED_JOB_RETENTION_HOURS`)
+   - Removes failed/interrupted jobs older than 30 minutes (configurable via `INTERRUPTED_JOB_RETENTION_MINUTES`)
+   - Cleans up associated files (PDFs, audio files, etc.)
+
+2. **Immediate Cleanup**: 
+   - Uploaded files are removed immediately after processing
+   - Empty files in the uploads directory are cleaned after each processing job
+
+3. **Manual Cleanup**:
+   - Run `python -m backend.cleanup --dry-run` to see what would be deleted
+   - Run `python -m backend.cleanup` to perform the actual cleanup
+
+All cleanup operations are logged for auditing and debugging purposes.
 
 ## Troubleshooting
 

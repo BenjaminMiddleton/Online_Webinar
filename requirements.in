@@ -14,7 +14,7 @@ pytest==7.4.4
 pytest-cov==4.1.0
 
 # Document generation
-fpdf2==2.7.8
+fpdf2
 python-docx==0.8.11
 reportlab==4.0.5
 

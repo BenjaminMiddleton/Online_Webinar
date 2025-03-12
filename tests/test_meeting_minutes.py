@@ -26,7 +26,7 @@ def mock_openai():
 def test_meeting_minutes_generation(mock_openai):
     """Test meeting minutes generation with mock API"""
     # Set an environment variable for the test
-    os.environ['OPENAI_MODEL'] = 'o3-mini'
+    os.environ['OPENAI_MODEL'] = 'gpt-4o'
     
     test_transcript = """
     Speaker 1: Let's discuss the project timeline.
@@ -51,3 +51,9 @@ def test_meeting_minutes_error_handling():
     none_result = generate_meeting_minutes(None)
     assert none_result['summary'] == ""
     assert none_result['action_points'] == []
+
+def test_get_token_param_name():
+    """Test get_token_param_name function"""
+    from backend.meeting_minutes import get_token_param_name
+    assert get_token_param_name("gpt-3.5-turbo") == "max_tokens"
+    assert get_token_param_name("gpt-4o") == "max_completion_tokens"

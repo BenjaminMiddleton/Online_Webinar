@@ -32,17 +32,20 @@ def test_large_transcript_api_error(monkeypatch):
 def test_large_transcript_summary(monkeypatch):
     # Create a very large valid fake transcript
     large_transcript = ("In today's meeting, we discussed important strategies for growth. " * 5000).strip()
-    
+
+    # Set the OPENAI_API_KEY environment variable for the test
+    monkeypatch.setenv("OPENAI_API_KEY", "test_api_key")
+
     # Monkeypatch call_openai_api to use the successful version
     from backend import meeting_minutes
     monkeypatch.setattr(meeting_minutes, "call_openai_api", fake_call_openai_api_success)
-    
+
     # Generate meeting minutes with the large transcript
     minutes = generate_meeting_minutes(large_transcript, speakers=["Speaker 1"], duration_seconds=7200)
-    
+
     # Print summary output for debugging
     print("Summary output:", minutes["summary"])
-    
+
     # Assert that the returned summary matches the fake response data
     assert minutes["summary"] == "This is a large transcript summary generated from a very large transcript. It covers all the major discussion points."
     assert minutes["action_points"] == ["Action 1", "Action 2"]

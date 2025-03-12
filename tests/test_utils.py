@@ -52,7 +52,7 @@ def get_token_param_name(model: str) -> str:
     else:
         return "max_tokens"
 
-def test_openai_connection(model: str = "o3-mini") -> Dict[str, Any]:
+def test_openai_connection(model: str = "gpt-4o") -> Dict[str, Any]:
     """Test connection to OpenAI API with a simple request."""
     load_dotenv()
     api_key = os.getenv("OPENAI_API_KEY")
@@ -130,7 +130,7 @@ def debug_openai_request(
         return None
     
     if not model:
-        model = os.getenv("OPENAI_MODEL", "o3-mini")
+        model = os.getenv("OPENAI_MODEL", "gpt-4o")
     
     # Log request parameters
     logger.info(f"OpenAI API request:")
@@ -283,10 +283,10 @@ def check_api_billing():
         # Try a very small request first
         logger.info("Testing API with minimal request to check for billing issues...")
         
-        # Use the correct token parameter for o3-mini
-        token_param = get_token_param_name("o3-mini")
+        # Use the correct token parameter for gpt-4o
+        token_param = get_token_param_name("gpt-4o")
         params = {
-            "model": "o3-mini",
+            "model": "gpt-4o",
             "messages": [{"role": "user", "content": "Hello"}],
             token_param: 1  # Request just one token
         }

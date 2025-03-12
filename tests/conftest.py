@@ -7,7 +7,7 @@ from flask import Flask
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
 from backend.app import create_app
-from backend.config import Config  # Update import path
+from backend.config import Config
 
 class TestConfig(Config):
     """Test configuration."""
@@ -25,7 +25,7 @@ class TestConfig(Config):
 @pytest.fixture
 def app():
     """Create and configure a Flask app for testing."""
-    app = create_app(TestConfig())
+    app, socketio = create_app(TestConfig())
     
     # Create a test context
     with app.app_context():

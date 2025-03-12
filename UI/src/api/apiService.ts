@@ -1,9 +1,13 @@
 /// <reference types="vite/client" />
-import io from 'socket.io-client';
+import { io, Socket } from 'socket.io-client';
 
-// Define the API base URL and socket URL as constants
+// Use environment variables with fallbacks for local development
 export const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
-export const SOCKET_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+export const SOCKET_URL = import.meta.env.VITE_SOCKET_URL || 'http://localhost:5000';
+
+// For debugging
+console.log('Using API URL:', API_URL);
+console.log('Using Socket URL:', SOCKET_URL);
 
 // Define the MinutesData interface for type checking
 export interface MinutesData {
@@ -14,7 +18,7 @@ export interface MinutesData {
   transcription: string;
   speakers: string[];
   pdf_path?: string;
-  job_id?: string; // Added optional property to support job ID
+  job_id?: string; // Added job id to track processing results
 }
 
 // Define interfaces for job data
@@ -28,7 +32,7 @@ export interface JobResponse {
 }
 
 // Socket.IO connection singleton
-let socket: any = null;
+let socket!: Socket;
 
 /**
  * Initialize and get a singleton Socket.IO connection
@@ -53,7 +57,7 @@ export function getSocket() {
     });
   }
   
-  return socket;
+  return socket; // Now safe as socket is never null
 }
 
 /**
@@ -123,34 +127,17 @@ export function getLastJobData(): { jobId: string | null, jobData: any | null } 
  */
 export function joinJobRoom(jobId: string, onUpdate?: (data: any) => void, onComplete?: (data: any) => void) {
   const s = getSocket();
-  
-  // Remove any existing listeners for this job first
   s.off('processing_update');
   s.off('processing_complete');
   s.off('processing_error');
-  
-  // Set up new listeners
   if (onUpdate) {
-    s.on('processing_update', (data: any) => {
-      if (data.job_id === jobId) {
-        onUpdate(data);
-      }
-    });
+    s.on('processing_update', (data: any) => { if (data.job_id === jobId) onUpdate(data); });
   }
-  
   if (onComplete) {
-    s.on('processing_complete', (data: any) => {
-      if (data.job_id === jobId) {
-        onComplete(data);
-      }
-    });
+    s.on('processing_complete', (data: any) => { if (data.job_id === jobId) onComplete(data); });
   }
-  
-  // Notify server to join the room for this job ID
   s.emit('rejoin_job', { job_id: jobId });
-  
   return () => {
-    // Return cleanup function
     s.off('processing_update');
     s.off('processing_complete');
     s.off('processing_error');

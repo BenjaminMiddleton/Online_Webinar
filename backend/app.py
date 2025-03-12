@@ -4,10 +4,10 @@ import logging
 from flask import Flask, request, jsonify, send_file, current_app
 from flask_cors import CORS
 from marshmallow import Schema, fields, validate
-from config import Config
-from utils import handle_errors, APIError
-from logger import configure_logger
-import meeting_minutes
+from backend.config import Config
+from backend.utils import handle_errors, APIError
+from backend.logger import configure_logger
+import backend.meeting_minutes
 from werkzeug.utils import secure_filename
 import threading
 import io
@@ -20,14 +20,14 @@ from flask_socketio import SocketIO, emit
 import json
 import traceback
 from fpdf import FPDF
-from meeting_minutes import generate_meeting_minutes
-from pdf_generator import generate_pdf, generate_downloadable_pdf
-from job_manager import update_job_status, get_job_status
-from docx_generator import generate_docx
+from backend.meeting_minutes import generate_meeting_minutes
+from backend.pdf_generator import generate_pdf, generate_downloadable_pdf
+from backend.job_manager import update_job_status, get_job_status
+from backend.docx_generator import generate_docx
 # Import storage utility functions
-from storage import save_file, save_to_local, save_to_azure, cleanup_file, generate_unique_filename
+from backend.storage import save_file, save_to_local, save_to_azure, cleanup_file, generate_unique_filename
 # Import audio utility functions 
-from audio_utils import (
+from backend.audio_utils import (
     process_audio_duration, 
     format_duration, 
     process_audio_file, 
@@ -35,7 +35,11 @@ from audio_utils import (
     process_vtt_file, 
     handle_vtt_file
 )
-from speaker_diarization import diarize_audio, load_models
+from backend.speaker_diarization import diarize_audio, load_models
+# Add this import for scheduled cleanup
+from backend.scheduled_tasks import schedule_cleanup_task, cleanup_task
+# Add this import with other imports
+from backend.environment import Environment
 
 # Near the top after imports
 def configure_logging():
@@ -74,7 +78,7 @@ def initialize_ai_models(app):
     """Initialize AI models with configured parameters."""
     try:
         # Log the AI model being used
-        openai_model = app.config.get('OPENAI_MODEL', 'o3-mini')
+        openai_model = app.config.get('OPENAI_MODEL', 'gpt-4o')
         app.logger.info(f"Using OpenAI model: {openai_model}")
         
         # Any other model initialization can go here
@@ -87,37 +91,60 @@ def create_app(config=None):
     """Application factory pattern to create and configure Flask app."""
     app = Flask(__name__)
     
-    # Allow all origins in development for easier debugging with explicit localhost ports
+    # Load configuration
+    if config:
+        app.config.from_object(config)
+    else:
+        app.config.from_object(Config())
+    
+    # Set up CORS – allow common localhost origins for development
     CORS(app, resources={
         r"/*": {
-            # Allow common localhost ports that Vite might use
-            "origins": ["http://localhost:5173", "http://localhost:5174", "http://127.0.0.1:5173", "http://127.0.0.1:5174", "*"],
+            "origins": ["http://localhost:5173", "http://127.0.0.1:5173", "*"],
             "methods": ["GET", "POST", "OPTIONS"],
             "allow_headers": ["Content-Type", "Authorization"],
-            "supports_credentials": False  # Set to False for simpler testing
+            "supports_credentials": False
         }
     })
     
-    # Determine allowed origins for Socket.IO based on environment
-    allowed_origins = [origin.strip() for origin in os.environ.get("CORS_ALLOWED_ORIGINS", "").split(",") if origin.strip()]
+    # Ensure upload directory exists
+    upload_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), 'uploads'))
+    os.makedirs(upload_dir, exist_ok=True)
+    app.config['UPLOAD_FOLDER'] = upload_dir
+
+    # Set allowed extensions
+    app.config['ALLOWED_AUDIO_EXTENSIONS'] = {'wav', 'mp3', 'ogg', 'flac', 'm4a'}
+    app.config['ALLOWED_VTT_EXTENSIONS'] = {'vtt', 'srt'}
+
+    # Set default file cleanup configuration
+    app.config.setdefault('COMPLETED_JOB_RETENTION_HOURS', 24)
+    app.config.setdefault('INTERRUPTED_JOB_RETENTION_MINUTES', 30)
+    app.config.setdefault('ENABLE_SCHEDULED_CLEANUP', True)
+
+    # Configure logging
+    configure_logger(app)
+
+    # Set up rate limiting
+    limiter = Limiter(app=app, key_func=get_remote_address,
+                      default_limits=["200 per day", "50 per hour"])
+
+    # Initialize Socket.IO with allowed origins from env or fallback
+    allowed_origins = [o.strip() for o in os.environ.get("CORS_ALLOWED_ORIGINS", "").split(",") if o.strip()]
     if not allowed_origins:
-        allowed_origins = ["https://production.example.com"] if not app.config.get("DEBUG", True) else ["*"]
-    
-    # Improved Socket.IO setup with allowed origins from env variable
+        allowed_origins = ["*"] if app.config.get("DEBUG", True) else ["https://production.example.com"]
     socketio = SocketIO(
-        app, 
+        app,
         cors_allowed_origins=allowed_origins,
         async_mode='threading',
-        logger=False,  # Disable logging for production
-        engineio_logger=False,  # Disable logging for production
+        logger=False,
+        engineio_logger=False,
         ping_timeout=60,
-        ping_interval=25,
-        allow_upgrades=True,  # Allow transport upgrades
+        ping_interval=25
     )
-    
+    app.socketio = socketio
+
     # Make socketio available at the module level
     app.socketio = socketio
-    
     # Register Socket.IO event handlers
     @socketio.on('connect')
     def handle_connect():
@@ -164,11 +191,11 @@ def create_app(config=None):
     upload_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), 'uploads'))
     os.makedirs(upload_dir, exist_ok=True)
     app.config['UPLOAD_FOLDER'] = upload_dir
-    
+
     # Set allowed extensions
     app.config['ALLOWED_AUDIO_EXTENSIONS'] = {'wav', 'mp3', 'ogg', 'flac', 'm4a'}
     app.config['ALLOWED_VTT_EXTENSIONS'] = {'vtt', 'srt'}  # Add this line to define VTT extensions
-    
+
     # Load configuration
     if config is None:
         if os.environ.get("FLASK_ENV", "development") == "production":
@@ -181,10 +208,15 @@ def create_app(config=None):
         
     # Configure logging
     configure_logger(app)
-    
+
     # Ensure upload directory exists
     UPLOAD_FOLDER = app.config['UPLOAD_FOLDER']
     os.makedirs(UPLOAD_FOLDER, exist_ok=True)
+    
+    # Add default values for cleanup configuration
+    app.config.setdefault('COMPLETED_JOB_RETENTION_HOURS', 24)  # Keep completed jobs for 24 hours
+    app.config.setdefault('INTERRUPTED_JOB_RETENTION_MINUTES', 30)  # Keep interrupted jobs for 30 minutes
+    app.config.setdefault('ENABLE_SCHEDULED_CLEANUP', True)  # Enable scheduled cleanup by default
     
     # Set up rate limiting
     limiter = Limiter(
@@ -200,12 +232,15 @@ def create_app(config=None):
     with app.app_context():
         load_models()
         initialize_ai_models(app)  # Pass the app instance to the function
-    
+        
+        # Start scheduled cleanup tasks if enabled
+        if app.config.get('ENABLE_SCHEDULED_CLEANUP', True):
+            app.cleanup_scheduler = schedule_cleanup_task(app)
+            app.logger.info("Scheduled cleanup task initialized")
     return app, socketio
 
 def register_routes(app, limiter):
     """Register all application routes."""
-    
     @app.route('/health', methods=['GET'])
     def health_check():
         """Health check endpoint to verify system functionality."""
@@ -242,9 +277,9 @@ def register_routes(app, limiter):
             return jsonify({
                 'status': 'unhealthy',
                 'error': str(e),
-                'timestamp': datetime.now().isoformat()
+                'timestamp': datetime.now().isoformat()        
             }), 500
-    
+
     @app.route("/upload", methods=["POST"])
     @limiter.limit("30 per minute")
     @handle_errors
@@ -252,7 +287,6 @@ def register_routes(app, limiter):
         try:
             if "file" not in request.files:
                 raise APIError("No file uploaded", status_code=400)
-
             file = request.files["file"]
             if not file or file.filename == "":
                 raise APIError("No selected file", status_code=400)
@@ -323,10 +357,14 @@ def register_routes(app, limiter):
             raise APIError("Unsupported format", status_code=400)
 
         # Generate appropriate document
-        if format == 'docx':
-            return generate_docx(data)
-        else:
-            return generate_pdf(data)
+        try:
+            if format == 'docx':
+                return generate_docx(data)
+            else:
+                return generate_pdf(data)
+        except Exception as e:
+            app.logger.error(f"Error generating document: {str(e)}")
+            return jsonify({"error": str(e)}), 500
 
     @app.route("/export/pdf", methods=["POST"])
     def export_pdf():
@@ -360,7 +398,6 @@ def register_routes(app, limiter):
         try:
             if 'file' not in request.files:
                 return jsonify({'error': 'No file part'}), 400
-            
             file = request.files['file']
             if file.filename == '':
                 return jsonify({'error': 'No file selected'}), 400
@@ -393,7 +430,6 @@ def register_routes(app, limiter):
                     'filepath': filepath,
                     'file_exists': False
                 }
-            
             return jsonify(result)
         except Exception as e:
             app.logger.error(f"Test upload error: {str(e)}")
@@ -468,6 +504,15 @@ def register_routes(app, limiter):
                 'message': str(e)
             }), 500
 
+    # Add this route in the register_routes function
+    @app.route("/api/config", methods=["GET"])
+    def get_config():
+        """Return environment configuration."""
+        # Add CORS headers since this endpoint might be called directly
+        response = jsonify(Environment.get_config_json())
+        response.headers.add('Access-Control-Allow-Origin', '*')
+        return response
+
 def process_file_background(app, file_extension, filepath, job_id, original_filename):
     """Process the uploaded file in a background thread with improved error handling."""
     with app.app_context():
@@ -540,7 +585,6 @@ def process_file_background(app, file_extension, filepath, job_id, original_file
                 elif file_extension.lower() in app.config['ALLOWED_VTT_EXTENSIONS']:
                     app.logger.info(f"Processing VTT file: {filepath}")
                     app.socketio.emit("processing_update", {"job_id": job_id, "status": "processing_vtt"})
-                    
                     try:
                         transcript = handle_vtt_file(app, filepath)
                         speakers = []  # VTT does not include speakers
@@ -559,8 +603,8 @@ def process_file_background(app, file_extension, filepath, job_id, original_file
                 app.socketio.emit("processing_update", {"job_id": job_id, "status": "generating_minutes"})
                 meeting_title = base_filename
                 force_chunking = len(transcript) > 8000  # force chunking for long transcripts
-                
                 app.logger.info(f"Generating meeting minutes (length: {len(transcript)}, force_chunking: {force_chunking})")
+                
                 try:
                     minutes = generate_meeting_minutes(transcript, speakers=speakers, duration_seconds=duration_seconds)
                     minutes["title"] = meeting_title
@@ -626,7 +670,29 @@ def process_file_background(app, file_extension, filepath, job_id, original_file
             update_job_status(job_id, "error", error=str(e))
             app.socketio.emit("processing_error", {"job_id": job_id, "error": str(e), "timestamp": datetime.now().isoformat()})
         finally:
+            # Clean up the uploaded file in any case (success or error)
             cleanup_file(app, filepath)
+            # Run a targeted cleanup of any old files (more than 1 hour old) in the uploads directory
+            # This helps clean up any "orphaned" files that might have been missed
+            if app.config.get('ENABLE_IMMEDIATE_UPLOADS_CLEANUP', True):
+                try:
+                    uploads_dir = app.config.get('UPLOAD_FOLDER', 'uploads')
+                    app.logger.info(f"Running immediate cleanup for old files in uploads directory: {uploads_dir}")
+                    
+                    # Import only when needed
+                    from backend.cleanup import JobCleaner
+                    
+                    cleaner = JobCleaner(
+                        job_results_dir=os.path.join(app.root_path, "..", "job_results"),
+                        # Use more aggressive cleanup for immediate cleanup
+                        completed_job_retention_hours=1,  # Clean files older than 1 hour
+                        interrupted_job_retention_minutes=30  # Clean interrupted jobs older than 30 mins
+                    )
+                    # Only clean empty uploads, not job files
+                    result = cleaner.cleanup_empty_uploads()
+                    app.logger.info(f"Immediate cleanup completed: {result} empty files removed")
+                except Exception as cleanup_err:
+                    app.logger.warning(f"Error in immediate cleanup: {str(cleanup_err)}")
 
 def ensure_complete_minutes(minutes):
     """Ensure minutes has all required fields, adding empty values for any missing fields."""
@@ -638,7 +704,6 @@ def ensure_complete_minutes(minutes):
         "transcription": "",
         "speakers": []
     }
-    
     for field, default_value in required_fields.items():
         if field not in minutes or minutes[field] is None:
             minutes[field] = default_value

@@ -1,9 +1,7 @@
 import os
-import json
-import time
 from datetime import datetime
 from flask import current_app
-from typing import Dict, Any, List, Optional
+from typing import Optional
 
 class FileRegistry:
     """Simple registry to track files through processing pipeline"""
@@ -18,14 +16,18 @@ class FileRegistry:
             'file_type': file_type,
             'registered_at': datetime.now().isoformat()
         }
-        if self.app:
-            self.app.logger.info(f"Registered file for job {job_id}: {original_path}")
+        try:
+            current_app.logger.info(f"Registered file for job {job_id}: {original_path}")
+        except RuntimeError:
+            print(f"Registered file for job {job_id}: {original_path}")
     
-    def get_path(self, job_id):
+    def get_path(self, job_id) -> Optional[str]:
         if job_id in self.registry:
             path = self.registry[job_id]['original_path']
             if os.path.exists(path):
                 return path
+            else:
+                print(f"File for job {job_id} does not exist: {path}")
         return None
 
 # Initialize with Flask app

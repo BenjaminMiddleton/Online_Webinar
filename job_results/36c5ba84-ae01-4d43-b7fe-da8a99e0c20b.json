@@ -1,0 +1,14 @@
+{
+  "job_id": "36c5ba84-ae01-4d43-b7fe-da8a99e0c20b",
+  "status": "completed",
+  "timestamp": "2025-03-12T13:02:35.831910",
+  "minutes": {
+    "title": "Test",
+    "duration": "N/A",
+    "summary": "",
+    "action_points": [],
+    "transcription": "Speaker 1: This is a test transcript.\nSpeaker 2: Testing the upload functionality.",
+    "speakers": [],
+    "pdf_path": "C:\\Users\\alist\\Documents\\Envisage\\Meeting-Management-Project\\pdf_output_files\\test.pdf"
+  }
+}

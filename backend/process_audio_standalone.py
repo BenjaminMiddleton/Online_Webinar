@@ -94,6 +94,11 @@ def process_audio_file_standalone(audio_file_path):
     Returns:
         str: Path to the generated PDF file, or None if processing failed
     """
+    # Check if the file exists first
+    if not os.path.exists(audio_file_path):
+        print(f"Error: File not found at {audio_file_path}")
+        return None
+        
     # Use hardcoded allowed extensions
     allowed_audio_extensions = ALLOWED_AUDIO_EXTENSIONS
     
@@ -196,6 +201,9 @@ def process_audio_file_standalone(audio_file_path):
         except Exception as e:
             print(f"Error generating DOCX: {str(e)}")
 
+        print("\nProcessing completed successfully!")
+        print(f"Output file: {pdf_path}")
+        print("Processing completed successfully!")
         return pdf_path
             
     except Exception as e:

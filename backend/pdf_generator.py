@@ -21,6 +21,9 @@ def sanitize_text(text):
     # Remove control characters
     text = re.sub(r'[\x00-\x08\x0B\x0C\x0E-\x1F\x7F]', '', text)
     
+    # Remove bullet character
+    text = re.sub(r'\u2022', '', text)
+    
     # Handle encoding issues
     text = text.encode('utf-8', errors='ignore').decode('utf-8')
     
@@ -109,6 +112,8 @@ def generate_pdf(data: Dict[str, Any], job_id: str = None, original_filename: st
                         logger.warning(f"Skipping problematic action point: {str(cell_err)}")
                         # Try with plain text without bullet
                         try:
+                            # Further sanitize the text
+                            point_text = sanitize_text(point_text.replace(chr(127), ''))
                             pdf.multi_cell(0, 6, f"- {point_text}")
                         except:
                             # If still fails, just skip this item

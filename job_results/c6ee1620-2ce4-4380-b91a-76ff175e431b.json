@@ -1,6 +1,0 @@
-{
-  "job_id": "c6ee1620-2ce4-4380-b91a-76ff175e431b",
-  "status": "error",
-  "timestamp": "2025-03-11T09:22:34.995051",
-  "error": "Audio processing failed: Error opening 'uploads\\\\c6ee1620-2ce4-4380-b91a-76ff175e431b_Crop_Envisage_Audio.wav': Format not recognised."
-}

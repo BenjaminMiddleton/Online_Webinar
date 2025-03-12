@@ -5,7 +5,7 @@ from pydub import AudioSegment
 from flask import current_app
 from werkzeug.utils import secure_filename
 import uuid
-from utils import APIError
+from backend.utils import APIError
 import logging  # <== new import
 logger = logging.getLogger(__name__)  # <== new logger definition
 

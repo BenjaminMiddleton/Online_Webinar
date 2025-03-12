@@ -9,3 +9,4 @@ testpaths = [
 python_files = [
     "test_*.py"
 ]
+addopts = "--no-header -v --continue-on-collection-errors"

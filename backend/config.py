@@ -61,6 +61,13 @@ class Config:
         # SocketIO logging settings
         self.SOCKETIO_LOGGING = os.environ.get('SOCKETIO_LOGGING', 'False').lower() == 'true'
         
+        # Add file cleanup configuration
+        self.COMPLETED_JOB_RETENTION_HOURS = int(os.getenv('COMPLETED_JOB_RETENTION_HOURS', '24'))
+        self.INTERRUPTED_JOB_RETENTION_MINUTES = int(os.getenv('INTERRUPTED_JOB_RETENTION_MINUTES', '30'))
+        self.ENABLE_SCHEDULED_CLEANUP = os.getenv('ENABLE_SCHEDULED_CLEANUP', 'true').lower() == 'true'
+        self.ENABLE_IMMEDIATE_UPLOADS_CLEANUP = os.getenv('ENABLE_IMMEDIATE_UPLOADS_CLEANUP', 'true').lower() == 'true'
+        self.CLEANUP_INTERVAL_HOURS = float(os.getenv('CLEANUP_INTERVAL_HOURS', '4.0'))
+        
     def _validate_env_vars(self):
         """Validate that all required environment variables are present."""
         missing_vars = [var for var in self.required_vars if not os.getenv(var)]
