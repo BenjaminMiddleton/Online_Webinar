@@ -25,4 +25,4 @@ processes = []
   processes = ["app"]
 
 [vm]
-  memory = "1024" # Increase memory to 1GB
+  memory = "4096" # Increase memory to 4GB
