@@ -9,6 +9,7 @@ from openai import OpenAI
 from dotenv import load_dotenv
 from flask import Flask
 from tenacity import retry, stop_after_attempt, wait_exponential, retry_if_exception_type
+from typing import Tuple, List, Dict
 
 try:
     import tiktoken  # Ensure you have installed 'tiktoken' via your requirements (pip install tiktoken)
@@ -92,7 +93,7 @@ def get_token_param_name(model: str) -> str:
 def model_supports_temperature(model_name: str) -> bool:
     return not ('o3-mini' in model_name.lower())
 
-def parse_teams_vtt(vtt_file: str) -> tuple[str, list[str]]:
+def parse_teams_vtt(vtt_file: str) -> Tuple[str, List[str]]:
     if not os.path.isfile(vtt_file):
         logger.error(f"File '{vtt_file}' does not exist.")
         return "", []
@@ -122,7 +123,7 @@ def parse_teams_vtt(vtt_file: str) -> tuple[str, list[str]]:
     transcript_text = " ".join(l for l in transcript_lines if l.strip())
     return transcript_text, sorted(list(speakers))
 
-def chunk_transcript(transcript_text: str, max_chunk_tokens: int = 6000, overlap_tokens: int = 250) -> list[str]:
+def chunk_transcript(transcript_text: str, max_chunk_tokens: int = 6000, overlap_tokens: int = 250) -> List[str]:
     logger.info(f"Chunking transcript of {len(transcript_text)} chars (est. {estimate_tokens(transcript_text)} tokens)")
     estimated_total_tokens = estimate_tokens(transcript_text)
     if estimated_total_tokens <= max_chunk_tokens:
