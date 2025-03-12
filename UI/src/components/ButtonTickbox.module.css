@@ -1,0 +1,89 @@
+.tickboxdefault {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 26px;
+  height: 26px;
+  opacity: 0;
+  cursor: pointer;
+  margin: 0;
+  z-index: 2;
+}
+
+.buttonTickbox {
+  align-self: stretch;
+  display: flex;
+  flex-direction: row;
+  align-items: flex-start;
+  justify-content: flex-start;
+  padding: var(--padding-9xs) 0px 0px;
+  position: relative;
+}
+
+.tickboxContainer {
+  position: relative;
+  width: 26px;
+  height: 26px;
+}
+
+.customTickbox {
+  position: absolute;
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+  width: 26px;
+  height: 26px;
+  border-radius: 5px;
+  border: 2px solid #444;
+  z-index: 1;
+  padding: 0; /* Removed padding */
+  box-sizing: border-box;
+}
+
+/* Hover state */
+.tickboxdefault:hover + .customTickbox {
+  display: flex;
+  width: 26px;
+  height: 26px;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+.tickboxdefault:hover + .customTickbox .tickSvg {
+  display: block;
+}
+
+.tickboxdefault:hover + .customTickbox .tickSvg path {
+  fill: #A4A4A4;
+}
+
+/* Checked state */
+.tickboxdefault:checked + .customTickbox {
+  display: flex;
+  width: 26px;
+  height: 26px;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  background-color: #9AD3B9;
+  border-color: #9AD3B9;
+}
+
+.tickboxdefault:checked + .customTickbox .tickSvg {
+  display: block;
+}
+
+.tickboxdefault:checked + .customTickbox .tickSvg path {
+  fill: #F8F8F8; /* Updated tick color */
+}
+
+.tickSvg {
+  width: 14px;
+  height: 11px;
+  flex-shrink: 0;
+  display: none;
+  position: relative; /* Changed from absolute to relative */
+  top: 0; /* Reset top */
+  left: 0; /* Reset left */
+}

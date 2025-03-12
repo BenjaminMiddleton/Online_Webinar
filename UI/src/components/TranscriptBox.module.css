@@ -1,0 +1,259 @@
+.chatTitle {
+  margin: 0;
+  align-self: stretch;
+  flex: 1;
+  position: relative;
+  font-size: inherit;
+  text-transform: lowercase;
+  font-weight: 500;
+  font-family: inherit;
+  display: flex;
+  align-items: center;
+}
+.chatTitle1 {
+  align-self: stretch;
+  flex: 1;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: flex-start;
+}
+.dateAndArrow {
+  width: 270px;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: flex-end;
+  text-align: center;
+}
+.header {
+  align-self: stretch;
+  height: 59px;
+  border-radius: var(--br-2xs) var(--br-2xs) 0px 0px;
+  background: linear-gradient(180deg, #a2a2a2, var(--color-silver) 65%);
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: flex-start;
+  padding: var(--padding-3xs) 0px var(--padding-3xs) var(--padding-lg);
+  box-sizing: border-box;
+}
+.transcript {
+  align-self: stretch;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  padding: var(--padding-lg);
+  gap: var(--gap-lg);
+  font-size: var(--font-size-9xl);
+  color: var(--color-darkslategray-100);
+  overflow: visible; /* Change from hidden to visible */
+  box-sizing: border-box;
+  padding-bottom: var(--padding-lg);
+  transition: padding-bottom 200ms cubic-bezier(0.4, 0.0, 0.2, 1);
+  height: auto; /* Ensure it expands with content */
+}
+
+.transcriptFrame {
+  align-self: stretch;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: flex-start;
+}
+.transcriptBox {
+  align-self: stretch;
+  border-radius: var(--br-2xs);
+  background-color: var(--color-gainsboro-200);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  min-width: 549px;
+  text-align: left;
+  font-size: var(--font-size-21xl);
+  color: var(--color-whitesmoke-100);
+  font-family: var(--font-montserrat);
+  box-sizing: border-box; /* Ensure box-sizing is set to border-box */
+  gap: var(--gap-lg); /* Add gap to match ChatBox */
+  overflow: visible; /* Ensure content fits */
+  height: auto; /* Allow height to adjust to content */
+}
+
+@media screen and (max-width: 1400px) {
+  .transcriptFrame {
+    align-self: stretch;
+    width: auto;
+  }
+}
+
+.collapseEnter {
+  max-height: 0;
+  opacity: 0;
+  overflow: hidden;
+}
+
+.collapseEnterActive {
+  max-height: 1000px; /* adjust as needed */
+  opacity: 1;
+  transition: max-height 300ms cubic-bezier(0.4, 0.0, 0.2, 1),
+              opacity 300ms cubic-bezier(0.4, 0.0, 0.2, 1);
+}
+
+.collapseExit {
+  max-height: 1000px;
+  opacity: 1;
+  overflow: hidden;
+}
+
+.collapseExitActive {
+  max-height: 0;
+  opacity: 0;
+  transition: max-height 300ms cubic-bezier(0.4, 0.0, 0.2, 1),
+              opacity 300ms cubic-bezier(0.4, 0.0, 0.2, 1);
+}
+
+/* The inner wrapper for the collapsible content */
+.collapsibleContent {
+  transition: height 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  overflow: visible; /* Change from hidden to visible */
+  width: 100%; /* Ensure the inner wrapper fills its container */
+  display: flex;
+  flex-direction: column;
+  height: auto; /* Allow height to adjust to content */
+}
+
+.collapsed {
+  /* When collapsed, reduce the bottom padding to 0px */
+  padding-bottom: -20px;
+}
+
+.transcript.collapsed {
+  padding-bottom: 9px !important;
+  transition: padding-bottom 300ms cubic-bezier(0.4, 0.0, 0.2, 1);
+}
+
+.searchBox {
+  width: 100%;
+  border-radius: var(--br-2xs);
+  background-color: var(--color-whitesmoke-100);
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: flex-start;
+  padding: var(--padding-3xs);
+  box-sizing: border-box;
+  margin-bottom: var(--gap-lg); /* Add margin to match spacing */
+}
+
+.searchText {
+  width: 100%; /* Ensure full width */
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: flex-start;
+  gap: var(--gap-lg);
+}
+
+.symbolSearchSmall {
+  height: 34px;
+  width: 34px;
+  position: relative;
+}
+
+.search {
+  width: 100%; /* Ensure full width */
+  border: none;
+  outline: none;
+  font-family: var(--font-montserrat);
+  font-size: var(--font-size-9xl);
+  background-color: transparent;
+  color: #444444; /* Text color at 100% opacity */
+  text-align: left;
+  display: inline-block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-height: 272px;
+}
+
+.search::placeholder {
+  color: rgba(68, 68, 68, 0.47); /* Placeholder color at 47% opacity */
+}
+
+.replyBox {
+  width: 100%;
+  border-radius: var(--br-2xs);
+  background-color: var(--color-whitesmoke-100);
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: flex-start;
+  padding: var(--padding-3xs);
+  box-sizing: border-box;
+  margin-bottom: var(--gap-sm); /* Add margin to match spacing */
+  height: auto; /* Allow height to adjust based on content */
+  min-height: 50px; /* Add minimum height */
+}
+
+.questionText {
+  width: 100%; /* Ensure full width */
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: flex-start;
+}
+
+.transcriptBody {
+  width: 100%;  /* fills container horizontally */
+  border: none;
+  background-color: transparent;
+  font-family: var(--font-montserrat);
+  font-size: var(--font-size-9xl);
+  outline: none;
+  color: var(--color-darkslategray-100);
+  text-align: left;
+  display: block;  /* changed to block so it uses 100% width */
+  overflow: visible; /* Change from hidden to visible */
+  height: auto; /* Allow height to adjust to content */
+  min-height: 50px; /* Add minimum height */
+}
+
+.transcriptText {
+  font-family: monospace;
+  white-space: pre-wrap;
+  word-break: break-word;
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  height: auto; /* Allow height to adjust to content */
+  overflow: visible; /* Ensure content is visible */
+}
+
+.speakersSection {
+  margin-bottom: 15px;
+  padding: 10px;
+  background-color: var(--color-whitesmoke-100);
+  border-radius: var(--br-2xs);
+  width: 100%;
+}
+
+.speakersLabel {
+  font-weight: 600;
+  margin-bottom: 8px;
+  color: var(--color-darkslategray-100);
+}
+
+.speakersList {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.speakerItem {
+  background-color: #e3e3e3;
+  padding: 4px 10px;
+  border-radius: 16px;
+  font-size: 12px;
+  color: var(--color-darkslategray-100);
+}

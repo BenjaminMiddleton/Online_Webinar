@@ -1,0 +1,21 @@
+{
+  "job_id": "8a1ee898-11aa-4433-b456-8387951f7146",
+  "status": "completed",
+  "timestamp": "2025-03-11T17:38:25.692992",
+  "minutes": {
+    "title": "Short Envisage Test",
+    "duration": "00:00:50",
+    "summary": "The meeting involved discussing the specifics of a new job opening, the Head of Financial Reporting position, for Nav Chirag’s team. Key details such as the job title, work location (Coventry), and candidate requirements (a minimum of three years post-qualification experience and basic qualifications) were clarified.",
+    "action_points": [
+      "Finalize the official job description for the Head of Financial Reporting role including all discussed requirements.",
+      "Prepare recruitment materials and initiate the candidate screening process based on the established criteria."
+    ],
+    "transcription": "[00:02] SPEAKER_00: This is a voice recording between Craig Bonham and Nav Chirag to discuss a job role in his team.\n[00:14] SPEAKER_01: date is the 29th is it of January. So first question so Nav you're looking for a role what's the title?\n[00:25] SPEAKER_02: Title is Head of Financial Reporting.\n[00:28] SPEAKER_02: and the location.\n[00:30] SPEAKER_01: The nation is Coventry.\n[00:33] SPEAKER_01: How many years of experience are you looking forward to?\n[00:37] SPEAKER_02: for at least three years post-qualification experience.  Yeah, okay.\n[00:44] SPEAKER_01: And then what kind of qualifications are you looking for for the room?\n[00:47] SPEAKER_02: qualifications minimum.\n[00:48] SPEAKER_01: minimum\n",
+    "speakers": [
+      "SPEAKER_00",
+      "SPEAKER_01",
+      "SPEAKER_02"
+    ],
+    "pdf_path": "C:\\Users\\alist\\Documents\\Envisage\\CURRENT_Meeting_Management_Project_Prototype_Root\\pdf_output_files\\8a1ee898-11aa-4433-b456-8387951f7146_minutes.txt"
+  }
+}

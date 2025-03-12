@@ -1,0 +1,36 @@
+.slogan {
+  margin: 0;
+  align-self: stretch;
+  width: 508px;
+  position: relative;
+  font-size: inherit;
+  font-weight: 400;
+  font-family: inherit;
+  display: flex;
+  align-items: center;
+}
+.logoIcon {
+  width: 99px;
+  height: 36px;
+  position: relative;
+}
+.logoFrame {
+  align-self: stretch;
+  width: 99px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+.appTitle {
+  width: 625px;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: flex-end;
+  gap: var(--gap-lg);
+  text-align: left;
+  font-size: var(--font-size-45xl);
+  color: var(--color-whitesmoke-100);
+  font-family: var(--font-montserrat);
+}

@@ -1,0 +1,31 @@
+.attendeeNumber {
+  position: relative;
+  font-size: var(--font-size-3xl);
+  font-weight: 600;
+  font-family: var(--font-montserrat);
+  color: var(--color-gray);
+  text-align: left;
+}
+.buttonAttendee {
+  cursor: pointer;
+  border: none;
+  padding: var(--padding-8xs) var(--padding-9xs);
+  background-color: var(--color-gainsboro-100);
+  width: 33px;
+  height: 34px;
+  border-radius: var(--br-26xl);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+}
+
+/* Add hover effect */
+.buttonAttendee:hover {
+  background-color: #A2A2A2; /* Change background color on hover */
+}
+
+.buttonAttendee:hover .attendeeNumber {
+  color: #E6E6E6; /* Change text color on hover */
+}

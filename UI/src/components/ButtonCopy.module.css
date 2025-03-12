@@ -1,0 +1,43 @@
+.buttonCopy {
+  cursor: pointer;
+  border: none;
+  padding: var(--padding-6xs) var(--padding-9xs);
+  background-color: var(--color-gainsboro-100);
+  width: 34px;
+  height: 34px;
+  border-radius: var(--br-mid);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+}
+
+.copyIcon {
+  width: 20px;
+  height: 24px;
+  position: relative;
+  overflow: hidden;
+  flex-shrink: 0;
+  fill: currentColor; /* Use currentColor to inherit color */
+}
+
+/* Hover state */
+.buttonCopy:hover {
+  background-color: #A2A2A2; /* Change background color on hover */
+}
+
+.buttonCopy:hover .copyIcon path {
+  fill: #E6E6E6; /* Change icon color on hover */
+  stroke: #E6E6E6; /* Change icon stroke color on hover */
+}
+
+/* Press (active) state */
+.buttonCopy:active {
+  background-color: #A2A2A2; /* Change background color on press */
+}
+
+.buttonCopy:active .copyIcon path {
+  fill: #838383; /* Change icon color on press */
+  stroke: #838383; /* Change icon stroke color on press */
+}

@@ -1,0 +1,37 @@
+.buttonAllocatee {
+  cursor: pointer;
+  border: none;
+  padding: 0;
+  background-color: var(--color-gainsboro-100); /* Default background color */
+  height: 34.3px;
+  width: 34px;
+  position: relative;
+  border-radius: var(--br-mid); /* Add border radius */
+  box-sizing: border-box; /* Ensure box-sizing is border-box */
+}
+
+.allocateeIcon {
+  position: absolute;
+  top: 7px; /* Position 7px from the top */
+  left: 50%;
+  transform: translateX(-50%); /* Center horizontally */
+  width: 20px;
+  height: 18px;
+  color: #838383; /* Default icon color */
+}
+
+.buttonAllocatee:hover {
+  background-color: #A2A2A2; /* Hover background color */
+}
+
+.buttonAllocatee:hover .allocateeIcon {
+  color: #E6E6E6; /* Hover icon color */
+}
+
+.buttonAllocatee:active {
+  background-color: #A2A2A2; /* Press background color */
+}
+
+.buttonAllocatee:active .allocateeIcon {
+  color: #838383; /* Press icon color */
+}

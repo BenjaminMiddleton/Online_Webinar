@@ -1,0 +1,16 @@
+{
+  "job_id": "068a4dea-af30-4737-a828-9cf28582d03f",
+  "status": "completed",
+  "timestamp": "2025-03-11T17:34:46.027394",
+  "minutes": {
+    "title": "Short Test",
+    "duration": "00:00:07",
+    "summary": "The transcript is a brief test of the audio system, with a single speaker stating 'Testing, Testing, 1,2,3.' No discussion, decisions, or outcomes were recorded.",
+    "action_points": [],
+    "transcription": "[00:01] SPEAKER_00: Testing, Testing, 1, 2, 3, Testing, Testing, 1, 2, 3.\n",
+    "speakers": [
+      "SPEAKER_00"
+    ],
+    "pdf_path": "C:\\Users\\alist\\Documents\\Envisage\\CURRENT_Meeting_Management_Project_Prototype_Root\\pdf_output_files\\short_test.pdf"
+  }
+}

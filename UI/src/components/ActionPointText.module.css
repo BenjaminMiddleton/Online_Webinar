@@ -1,0 +1,95 @@
+.actionPointText {
+  align-self: stretch;
+  flex: 1;
+  position: relative;
+  display: flex;
+  align-items: center;
+  color: var(--color-darkslategray-100);
+  min-height: 24px;
+  outline: none;
+}
+
+/* Add style for placeholder text */
+.actionPointText:empty {
+  color: #838383;
+}
+
+.placeholder {
+  color: #838383;
+  position: absolute;
+  left: 0;
+  top: 0;
+  pointer-events: none; /* Allow clicks to go through to the editable div */
+  user-select: none; /* Prevent selection of placeholder text */
+}
+
+.actionPointTextContainer:hover {
+  background-color: #E6E6E6;
+  outline: 6px solid #E6E6E6;
+  border-radius: 11px;
+}
+.actionPointText1 {
+  flex: 1;
+  border-radius: var(--br-2xs);
+  display: flex;
+  flex-direction: row;
+  align-items: flex-start;
+  justify-content: flex-start;
+  padding: 0px var(--padding-5xs);
+}
+.actionPointText2 {
+  flex: 1;
+  display: flex;
+  flex-direction: row;
+  align-items: flex-start;
+  justify-content: flex-start;
+  text-align: left;
+  font-size: var(--font-size-9xl);
+  color: var(--color-darkslategray-100);
+  font-family: var(--font-montserrat);
+}
+.actionPointTextContainer {
+  display: flex;
+  flex: 1;
+  align-items: center;
+  justify-content: space-between;
+  position: relative; /* Add relative positioning */
+}
+.removeButton {
+  display: none; /* Initially hidden */
+  position: absolute; /* Position absolutely */
+  top: 50%; /* Center vertically */
+  right: 0; /* Pin to the right */
+  transform: translateY(-50%); /* Adjust for centering */
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  width: 24px; /* Set width */
+  height: 24px; /* Set height */
+  border-radius: 50%; /* Make it circular */
+  background-color: transparent; /* Default background */
+}
+.actionPointText2:hover .removeButton,
+.removeButton:hover {
+  display: block; /* Show on hover */
+}
+.removeButton:hover {
+  background-color: #A2A2A2; /* Change background color on hover */
+}
+.removeButton:active {
+  background-color: #A2A2A2; /* Keep background color on press */
+}
+.removeIcon {
+  width: 100%; /* Make the icon fit the button */
+  height: 100%; /* Make the icon fit the button */
+}
+.removeButton:hover .buttonBackground {
+  fill: #A2A2A2;
+}
+.removeButton:hover .buttonSymbol {
+  fill: #E6E6E6;
+}
+.removeButton:active .buttonSymbol {
+  fill: #838383;
+}

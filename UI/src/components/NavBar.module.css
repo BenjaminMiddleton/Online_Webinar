@@ -1,0 +1,92 @@
+.defaultArrowIcon {
+  height: 33px;
+  width: 20px;
+  position: relative;
+}
+.icon {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: flex-start;
+  padding: 0px var(--padding-7xs) 0px 0px;
+}
+.buttonBack {
+  cursor: pointer;
+  border: none;
+  padding: 0;
+  background-color: var(--buttondefault);
+  height: 58px;
+  width: 58px;
+  border-radius: var(--br-26xl);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+.vectorIcon {
+  height: 40px;
+  width: 40px;
+  position: relative;
+}
+.icon1 {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+}
+.vectorIcon1 {
+  width: 22px;
+  height: 23px;
+  position: relative;
+}
+.vectorIcon2 {
+  width: 28px;
+  height: 6px;
+  position: relative;
+}
+.icon2 {
+  align-self: stretch;
+  flex: 1;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 0px 0px var(--padding-7xs);
+  gap: var(--gap-11xs);
+}
+.navIcons {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: flex-start;
+  padding: 0px var(--padding-lg) 0px 0px;
+  gap: var(--gap-lg);
+}
+.navBar {
+  box-sizing: border-box;
+  position: static;
+  background: linear-gradient(180deg, #2a7491, #5cb9cd);
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%; /* Fill the entire width of the frame */
+  padding: var(--padding-5xs) var(--padding-lg);
+  gap: var(--gap-0);
+  text-align: left;
+  font-size: var(--font-size-45xl);
+  color: var(--color-whitesmoke-100);
+  font-family: var(--font-montserrat);
+  margin-bottom: 40px !important; /* Ensure 40px gap from the NavBar */
+}
+
+.minutesBox {
+  margin-left: 24px;
+  margin-top: 40px;
+}
+
+.transcriptBox {
+  margin-left: 24px;
+  margin-top: 40px; /* Adjusted to ensure correct spacing */
+}

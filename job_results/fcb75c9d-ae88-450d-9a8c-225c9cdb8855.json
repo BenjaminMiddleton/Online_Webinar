@@ -1,0 +1,6 @@
+{
+  "job_id": "fcb75c9d-ae88-450d-9a8c-225c9cdb8855",
+  "status": "error",
+  "timestamp": "2025-03-11T09:29:34.986147",
+  "error": "Audio processing failed: Error opening 'uploads\\\\fcb75c9d-ae88-450d-9a8c-225c9cdb8855_Crop_Envisage_Audio.wav': Format not recognised."
+}

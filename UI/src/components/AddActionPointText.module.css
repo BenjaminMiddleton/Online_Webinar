@@ -1,0 +1,57 @@
+.addActionPoint {
+  flex: 1;
+  position: relative;
+}
+.actionPointText {
+  flex: 1;
+  border-radius: var(--br-2xs);
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: flex-start;
+  padding: 0px var(--padding-5xs);
+  position: relative;
+}
+
+.addActionPointText {
+  align-self: stretch;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: flex-start; /* Align to center left */
+  gap: var(--gap-lg);
+  text-align: left;
+  font-size: var(--font-size-9xl);
+  color: var(--color-darkslategray-200);
+  font-family: var(--font-montserrat);
+  position: relative;
+}
+
+.addActionPointText:hover {
+  outline: 3px solid #E6E6E6;
+  border-radius: var(--br-2xs);
+  background-color: #E6E6E6;
+  color: #838383; /* Change text color on hover */
+}
+
+.addActionPointText:hover .vectorIcon path {
+  fill: #838383; /* Change SVG color on hover */
+}
+
+.addActionPointText:active {
+  outline: 3px solid #A2A2A2;
+  border-radius: var(--br-2xs);
+  background-color: #A2A2A2;
+  color: #E6E6E6; /* Change text color on active */
+}
+
+.addActionPointText:active .vectorIcon path {
+  fill: #E6E6E6; /* Change SVG color on active */
+}
+
+.symbolAdd {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%; /* Ensure it takes the full height of the container */
+}

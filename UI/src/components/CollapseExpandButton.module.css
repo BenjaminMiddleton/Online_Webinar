@@ -1,0 +1,35 @@
+.buttonCollapse {
+  cursor: pointer;
+  border: none;
+  padding: 0;
+  background-color: transparent;
+  width: 68px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: flex-start;
+  transition: background-color 200ms ease-in-out;
+  border-top-right-radius: var(--br-2xs); /* Match the header's top right corner radius */
+}
+
+.buttonCollapse:hover {
+  background: linear-gradient(180deg, #838383 0%, #A2A2A2 65%);
+}
+
+.collapseArrowIcon {
+  align-self: stretch;
+  height: 59px;
+  position: relative;
+  max-width: 100%;
+  overflow: hidden;
+  flex-shrink: 0;
+  transition: transform 200ms ease-in-out;
+}
+
+.collapsed .collapseArrowIcon {
+  transform: rotate(180deg);
+}
+
+.buttonCollapse:not(.collapsed) .collapseArrowIcon {
+  transform: rotate(360deg);
+}

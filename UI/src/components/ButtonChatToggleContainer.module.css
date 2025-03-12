@@ -1,0 +1,10 @@
+.container {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px; /* Ensure equal padding on all sides */
+  gap: 18px; /* Add gap between the buttons */
+  width: 100%; /* Make the container fill the width of the chatbox */
+  box-sizing: border-box; /* Ensure padding is included in the element's total width and height */
+}

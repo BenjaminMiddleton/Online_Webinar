@@ -1,0 +1,123 @@
+.nav-button {
+  display: flex;
+  width: 58px;
+  height: 58px;
+  justify-content: center;
+  align-items: center;
+  flex-shrink: 0;
+  border-radius: 45px;
+  background: #82CAD9;
+  transition: background 0.2s;
+  border: none;
+  cursor: pointer;
+  margin: 0px;
+  padding: 0;
+  overflow: visible;
+}
+
+.nav-button:hover {
+  background: #54A6C7;
+}
+
+.nav-button:active {
+  background: #458DAA;
+}
+
+/* SVG styling */
+.nav-button svg {
+  display: block;
+  width: 40px;
+  height: 40px;
+  overflow: visible;
+}
+
+.nav-button svg path {
+  transition: all 0.2s;
+}
+
+/* Override fill colors only when they don't have explicit attributes */
+.nav-button svg path:not([fill]) {
+  fill: #F8F8F8;
+}
+
+.nav-button:active svg path {
+  fill: #A2A2A2 !important;
+}
+
+/* Icon-specific styles */
+.arrow-button {
+  position: relative;
+}
+
+/* Hard-coded solution for the upload button */
+.upload-button img {
+  width: 40px;
+  height: 40px;
+}
+
+.files-button svg {
+  overflow: visible;
+}
+
+/* Add to your existing CSS */
+
+/* Upload status container */
+.file-upload-container {
+  position: relative;
+  display: inline-block;
+}
+
+/* Upload status overlay */
+.upload-status {
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  background-color: rgba(0, 0, 0, 0.8);
+  color: white;
+  padding: 5px 10px;
+  border-radius: 4px;
+  white-space: nowrap;
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  margin-top: 5px;
+  font-size: 14px;
+}
+
+/* Upload spinner */
+.upload-spinner {
+  width: 16px;
+  height: 16px;
+  border: 2px solid #f3f3f3;
+  border-top: 2px solid #3498db;
+  border-radius: 50%;
+  animation: spin 2s linear infinite;
+  margin-right: 8px;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* Error message */
+.upload-error {
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  background-color: rgba(220, 53, 69, 0.9);
+  color: white;
+  padding: 5px 10px;
+  border-radius: 4px;
+  white-space: nowrap;
+  z-index: 1000;
+  margin-top: 5px;
+  font-size: 14px;
+}
+
+/* Highlight button when uploading */
+.uploading svg {
+  filter: brightness(0.8) sepia(1) hue-rotate(170deg) saturate(5);
+}

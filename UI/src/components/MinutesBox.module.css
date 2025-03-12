@@ -1,0 +1,165 @@
+.chatTitle {
+  margin: 0;
+  align-self: stretch;
+  flex: 1;
+  position: relative;
+  font-size: inherit;
+  text-transform: lowercase;
+  font-weight: 500;
+  font-family: inherit;
+  display: flex;
+  align-items: center;
+}
+.chatTitle1 {
+  align-self: stretch;
+  flex: 1;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: flex-start;
+}
+.dd {
+  margin: 0;
+  position: relative;
+  font-size: inherit;
+  font-weight: 500;
+  font-family: inherit;
+}
+.mm {
+  margin: 0;
+  position: relative;
+  font-size: inherit;
+  font-weight: 500;
+  font-family: inherit;
+}
+.yy {
+  margin: 0;
+  position: relative;
+  font-size: inherit;
+  font-weight: 500;
+  font-family: inherit;
+}
+.date {
+  flex: 1;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: flex-end;
+  padding: 0px var(--padding-base) 0px 0px;
+  gap: var(--gap-11xl);
+}
+.dateAndArrow {
+  width: 270px;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: flex-end;
+  text-align: center;
+}
+.header {
+  align-self: stretch;
+  height: 59px;
+  border-radius: var(--br-2xs) var(--br-2xs) 0px 0px;
+  background: linear-gradient(180deg, #a2a2a2, var(--color-silver) 65%);
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: flex-start;
+  padding: var(--padding-3xs) 0px var(--padding-3xs) var(--padding-lg);
+  box-sizing: border-box;
+}
+.minutes {
+  /* Keep the parent container always visible,
+     but reduce the bottom padding to 9px instead of 18px */
+  align-self: stretch;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: var(--padding-lg);
+  gap: var(--gap-lg);
+  font-size: var(--font-size-9xl);
+  color: var(--color-darkslategray-100);
+  overflow: hidden;
+  padding-bottom: var(--padding-lg); /* assuming your left/right padding uses var(--padding-lg) */
+  transition: padding-bottom 200ms cubic-bezier(0.4, 0.0, 0.2, 1);
+}
+
+/* When expanded, use full (original) padding */
+.minutes {
+  padding: var(--padding-lg);
+  transition: padding-bottom 200ms cubic-bezier(0.4, 0.0, 0.2, 1);
+}
+
+.minutesFrame {
+  align-self: stretch;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch; /* Ensure full width */
+  justify-content: flex-start;
+  width: 100%; /* Ensure full width */
+  min-width: 100%; /* Ensure minimum width */
+}
+.minutesBox {
+  align-self: stretch;
+  border-radius: var(--br-2xs);
+  background-color: var(--color-gainsboro-200);
+  display: flex;
+  flex-direction: column;
+  align-items: stretch; /* Ensure full width */
+  justify-content: flex-start;
+  width: 100%; /* Ensure full width */
+  min-width: 100%; /* Ensure minimum width */
+  text-align: left;
+  font-size: var(--font-size-21xl);
+  color: var(--color-whitesmoke-100);
+  font-family: var(--font-montserrat);
+}
+
+@media screen and (max-width: 1400px) {
+  .minutesFrame {
+    align-self: stretch;
+    width: auto;
+  }
+}
+
+.collapseEnter {
+  max-height: 0;
+  opacity: 0;
+  overflow: hidden;
+}
+
+.collapseEnterActive {
+  max-height: 1000px; /* adjust as needed */
+  opacity: 1;
+  transition: max-height 300ms cubic-bezier(0.4, 0.0, 0.2, 1),
+              opacity 300ms cubic-bezier(0.4, 0.0, 0.2, 1);
+}
+
+.collapseExit {
+  max-height: 1000px;
+  opacity: 1;
+  overflow: hidden;
+}
+
+.collapseExitActive {
+  max-height: 0;
+  opacity: 0;
+  transition: max-height 300ms cubic-bezier(0.4, 0.0, 0.2, 1),
+              opacity 300ms cubic-bezier(0.4, 0.0, 0.2, 1);
+}
+
+/* The inner wrapper for the collapsible content */
+.collapsibleContent {
+  overflow: hidden;
+}
+
+.collapsed {
+  /* When collapsed, reduce the bottom padding to 0px */
+  padding-bottom: -20px;
+}
+
+.minutes.collapsed {
+  padding-bottom: 9px !important;
+  transition: padding-bottom 300ms cubic-bezier(0.4, 0.0, 0.2, 1);
+}
