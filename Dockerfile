@@ -5,9 +5,6 @@ FROM nvidia/cuda:11.8.0-cudnn8-runtime-ubuntu20.04
 ENV PYTHONUNBUFFERED 1
 ENV APP_HOME /app
 
-# Create app directory
-WORKDIR ${APP_HOME}
-
 # Install system dependencies
 RUN apt-get update && apt-get install -y --no-install-recommends \
     ffmpeg \
@@ -21,6 +18,16 @@ ENV PATH="/root/.cargo/bin:${PATH}"
 
 # Install Python and pip
 RUN apt-get update && apt-get install -y python3 python3-pip
+
+# Set the Python version explicitly
+ENV PYTHON_VERSION 3.8
+
+# Update pip
+RUN pip3 install --no-cache-dir --upgrade pip
+
+# Reinstall tokenizers
+RUN pip3 uninstall -y tokenizers
+RUN pip3 install --no-cache-dir tokenizers
 
 # Copy requirements file
 COPY requirements.txt .
