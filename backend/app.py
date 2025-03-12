@@ -4,7 +4,7 @@ sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
 import uuid
 import logging
-from flask import Flask, request, jsonify, send_file, current_app
+from flask import Flask, request, jsonify, send_file, current_app, send_from_directory
 from flask_cors import CORS
 from marshmallow import Schema, fields, validate
 from backend.config import Config
@@ -521,6 +521,16 @@ def register_routes(app, limiter):
     @limiter.exempt
     def get_job_status_endpoint_alias(job_id):
         return get_job_status_endpoint(job_id)
+
+    @app.route('/', defaults={'path': ''})
+    @app.route('/<path:path>')
+    def serve_static(path):
+        """Serve static files from the React build."""
+        static_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), 'static'))
+        if path != "" and os.path.exists(os.path.join(static_dir, path)):
+            return send_from_directory(static_dir, path)
+        else:
+            return send_from_directory(static_dir, 'index.html')
 
 def process_file_background(app, file_extension, filepath, job_id, original_filename):
     """Process the uploaded file in a background thread with improved error handling."""
