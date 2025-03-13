@@ -64,9 +64,9 @@ RUN npm ci --prefer-offline --no-audit --progress=false
 # RUN echo "Running TypeScript check..." && \
 #     npx tsc --noEmit || echo "TypeScript errors detected but continuing build"
 
-# Run the build with detailed diagnostic information
-RUN echo "Running Vite build with diagnostics..." && \
-    VITE_DEBUG=true npm run build -- --debug
+# Run the build without --debug
+RUN echo "Running Vite build..." && \
+    npm run build
 
 # Set production environment for better optimization
 ENV NODE_ENV=production
