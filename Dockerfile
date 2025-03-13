@@ -51,10 +51,28 @@ RUN npm install
 # Capture verbose output from npm run build
 RUN npm run build --verbose 2>&1 | tee build_log.txt
 
+# Check the build output directory structure
+RUN ls -la && echo "Checking for build output directories..." && \
+    (ls -la dist || echo "dist directory not found") && \
+    (ls -la build || echo "build directory not found")
+
 # Copy static files from UI build to backend static folder
 WORKDIR ${APP_HOME}
 RUN mkdir -p backend/static
-RUN cp -r UI/dist/* backend/static/
+
+# Check for both common build output directories (dist or build)
+RUN if [ -d "UI/dist" ]; then \
+        echo "Found UI/dist directory, copying files..."; \
+        cp -r UI/dist/* backend/static/; \
+    elif [ -d "UI/build" ]; then \
+        echo "Found UI/build directory, copying files..."; \
+        cp -r UI/build/* backend/static/; \
+    else \
+        echo "ERROR: Neither UI/dist nor UI/build directory exists. Build may have failed."; \
+        echo "Contents of UI directory:"; \
+        ls -la UI/; \
+        exit 1; \
+    fi
 
 # Change working directory back to backend
 WORKDIR ${APP_HOME}/backend
