@@ -2,11 +2,21 @@
 import { io } from "socket.io-client";
 import type { Socket as SocketType } from "socket.io-client";
 
-// Use environment variables with fallbacks for local development
-export const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
-export const SOCKET_URL = import.meta.env.VITE_SOCKET_URL || 'http://localhost:5000';
+// Determine if we're in production mode
+const isProduction = import.meta.env.VITE_ENV === 'production' || !import.meta.env.VITE_ENV;
+
+// Use environment variables with fallbacks
+// In production with Railway, we can use relative URLs as the backend serves the frontend
+const API_URL = isProduction 
+  ? '' // Empty string means use relative URLs (same origin)
+  : (import.meta.env.VITE_API_URL || 'http://localhost:5000');
+
+const SOCKET_URL = isProduction
+  ? window.location.origin // Use current origin for WebSockets in production
+  : (import.meta.env.VITE_SOCKET_URL || 'http://localhost:5000');
 
 // For debugging
+console.log('Environment:', isProduction ? 'production' : 'development');
 console.log('Using API URL:', API_URL);
 console.log('Using Socket URL:', SOCKET_URL);
 
@@ -70,13 +80,17 @@ export async function uploadFile(file: File): Promise<JobResponse> {
     const formData = new FormData();
     formData.append('file', file);
     
-    const response = await fetch(`${API_URL}/upload`, {
+    const endpoint = `${API_URL}/upload`;
+    console.log(`Uploading to: ${endpoint}`);
+    
+    const response = await fetch(endpoint, {
       method: 'POST',
       body: formData,
     });
     
     if (!response.ok) {
-      throw new Error(`Upload failed with status: ${response.status}`);
+      const errorText = await response.text();
+      throw new Error(`Upload failed with status: ${response.status}, message: ${errorText}`);
     }
     
     return await response.json();

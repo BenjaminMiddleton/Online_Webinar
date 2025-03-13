@@ -32,6 +32,8 @@ class Environment:
         # Check for common cloud provider environment variables
         if any([
             os.environ.get("RAILWAY_STATIC_URL"),
+            os.environ.get("RAILWAY_SERVICE_ID"),
+            os.environ.get("RAILWAY_PROJECT_ID"),
             os.environ.get("HEROKU_APP_ID"),
             os.environ.get("RENDER_SERVICE_ID"),
             os.environ.get("VERCEL_URL")
@@ -59,11 +61,17 @@ class Environment:
         Returns:
             str: Host URL or None if undeterminable
         """
+        # Check Railway-specific environment variables first
+        if railway_url := os.environ.get("RAILWAY_STATIC_URL"):
+            if not railway_url.startswith(("http://", "https://")):
+                railway_url = f"https://{railway_url}"
+            logger.info(f"Detected Railway URL: {railway_url}")
+            return railway_url
+            
         # Check commonly used environment variables for host URL
         for env_var in [
-            "RENDER_EXTERNAL_URL",  # Prioritize RENDER_EXTERNAL_URL
             "HOST_URL",
-            "RAILWAY_STATIC_URL",
+            "RENDER_EXTERNAL_URL",
             "VERCEL_URL",
             "HEROKU_APP_URL"
         ]:
@@ -71,7 +79,7 @@ class Environment:
                 # Ensure URL has proper protocol
                 if not url.startswith(("http://", "https://")):
                     url = f"https://{url}"
-                logger.info(f"Detected host URL from {env_var}: {url}")  # Add logging
+                logger.info(f"Detected host URL from {env_var}: {url}")
                 return url
                 
         # In local environment, try to determine local IP
@@ -91,7 +99,7 @@ class Environment:
                 # If can't determine local IP
                 return "http://localhost:5000"
                 
-        logger.warning("Could not determine host URL")  # Add logging
+        logger.warning("Could not determine host URL")
         return None
         
     @staticmethod

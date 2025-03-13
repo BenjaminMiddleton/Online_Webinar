@@ -100,22 +100,39 @@ def create_app(config=None):
     else:
         app.config.from_object(Config())
     
-    # Set up CORS – allow common origins
+    # Set up CORS
     # Determine allowed origins based on environment
     let_origins = os.environ.get("CORS_ALLOWED_ORIGINS")
     if let_origins:
         allowed_origins = [o.strip() for o in let_origins.split(",") if o.strip()]
-    elif Environment.is_local():
-        allowed_origins = ["http://localhost:5173", "http://127.0.0.1:5173"]
+    elif Environment.is_production():
+        # In production on Railway, allow the Railway domain and any custom domains
+        railway_url = os.environ.get("RAILWAY_STATIC_URL", "")
+        railway_custom_domain = os.environ.get("RAILWAY_CUSTOM_DOMAIN", "")
+        allowed_origins = ["https://production.example.com"]  # Replace with your domain
+        
+        if railway_url:
+            if not railway_url.startswith(("http://", "https://")):
+                railway_url = f"https://{railway_url}"
+            allowed_origins.append(railway_url)
+            
+        if railway_custom_domain:
+            if not railway_custom_domain.startswith(("http://", "https://")):
+                railway_custom_domain = f"https://{railway_custom_domain}"
+            allowed_origins.append(railway_custom_domain)
+            
+        # Add a wildcard for Railway subdomains
+        allowed_origins.append("https://*.up.railway.app")
     else:
-        allowed_origins = ["https://production.example.com"]  # Replace with your production domain
+        allowed_origins = ["http://localhost:5173", "http://127.0.0.1:5173"]
 
+    app.logger.info(f"CORS allowed origins: {allowed_origins}")
     CORS(app, resources={
         r"/*": {
             "origins": allowed_origins,
             "methods": ["GET", "POST", "OPTIONS"],
             "allow_headers": ["Content-Type", "Authorization"],
-            "supports_credentials": False
+            "supports_credentials": True  # Changed to True for session support if needed
         }
     })
     
@@ -508,7 +525,6 @@ def register_routes(app, limiter):
                 'message': str(e)
             }), 500
 
-    # Add this route in the register_routes function
     @app.route("/api/config", methods=["GET"])
     def get_config():
         """Return environment configuration."""
@@ -520,17 +536,37 @@ def register_routes(app, limiter):
     @app.route("/api/job_status/<job_id>", methods=["GET"])
     @limiter.exempt
     def get_job_status_endpoint_alias(job_id):
+        """Alias for job status endpoint under /api path."""
         return get_job_status_endpoint(job_id)
 
     @app.route('/', defaults={'path': ''})
     @app.route('/<path:path>')
     def serve_static(path):
         """Serve static files from the React build."""
+        # First check if file exists in static directory
         static_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), 'static'))
-        if path != "" and os.path.exists(os.path.join(static_dir, path)):
+        
+        # Check if path points to an existing file
+        if path and os.path.exists(os.path.join(static_dir, path)):
             return send_from_directory(static_dir, path)
-        else:
+            
+        # For the UI build directory (from Railway build process)
+        ui_build_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'UI', 'dist'))
+        if os.path.exists(ui_build_dir):
+            # Check if path exists in UI build directory
+            if path and os.path.exists(os.path.join(ui_build_dir, path)):
+                return send_from_directory(ui_build_dir, path)
+            # Fallback to index.html for SPA routing
+            try:
+                return send_from_directory(ui_build_dir, 'index.html')
+            except:
+                app.logger.warning(f"Could not serve UI build files from {ui_build_dir}")
+        
+        # Final fallback to static/index.html
+        try:
             return send_from_directory(static_dir, 'index.html')
+        except:
+            return jsonify({"error": "Not found"}), 404
 
 def process_file_background(app, file_extension, filepath, job_id, original_filename):
     """Process the uploaded file in a background thread with improved error handling."""
@@ -566,14 +602,13 @@ def process_file_background(app, file_extension, filepath, job_id, original_file
             app.logger.info(f"Starting background processing for job: {job_id}")
             app.logger.info(f"File path: {filepath}, File extension: {file_extension}")
             app.logger.info(f"File exists: {os.path.exists(filepath)} Size: {os.path.getsize(filepath)} bytes")
-            
             update_job_status(job_id, "started")
             
             # Prepare title from original filename
             base_filename = os.path.splitext(original_filename)[0]
             base_filename = base_filename.replace("_", " ").replace("-", " ").title()
             app.logger.info(f"Base filename (for title): {base_filename}")
-
+            
             transcript = None
             speakers = []
             audio_duration = "N/A"
@@ -603,7 +638,6 @@ def process_file_background(app, file_extension, filepath, job_id, original_file
                     except Exception as audio_error:
                         app.logger.error(f"Diarization error: {str(audio_error)}", exc_info=True)
                         raise Exception(f"Audio processing failed: {str(audio_error)}")
-                    
                 elif file_extension.lower() in app.config['ALLOWED_VTT_EXTENSIONS']:
                     app.logger.info(f"Processing VTT file: {filepath}")
                     try:
@@ -632,7 +666,6 @@ def process_file_background(app, file_extension, filepath, job_id, original_file
                 meeting_title = base_filename
                 force_chunking = len(transcript) > 8000  # force chunking for long transcripts
                 app.logger.info(f"Generating meeting minutes (length: {len(transcript)}, force_chunking: {force_chunking})")
-                
                 try:
                     minutes = generate_meeting_minutes(transcript, speakers=speakers, duration_seconds=duration_seconds)
                     minutes["title"] = meeting_title
@@ -643,7 +676,6 @@ def process_file_background(app, file_extension, filepath, job_id, original_file
                 except Exception as minutes_error:
                     app.logger.error(f"Minutes generation error: {str(minutes_error)}", exc_info=True)
                     raise Exception(f"Minutes generation failed: {str(minutes_error)}")
-            
             except Exception as processing_error:
                 app.logger.error(f"Error during processing: {str(processing_error)}", exc_info=True)
                 update_job_status(job_id, "error", error=str(processing_error))
@@ -701,7 +733,6 @@ def process_file_background(app, file_extension, filepath, job_id, original_file
             except Exception as e:
                 app.logger.warning(f"SocketIO emit failed (processing_complete): {e}")
             app.logger.info(f"Completed processing for job: {job_id}")
-            
         except Exception as e:
             app.logger.error(f"Error in background processing: {str(e)}", exc_info=True)
             update_job_status(job_id, "error", error=str(e))
@@ -744,6 +775,7 @@ def ensure_complete_minutes(minutes):
         "transcription": "",
         "speakers": []
     }
+    
     for field, default_value in required_fields.items():
         if field not in minutes or minutes[field] is None:
             minutes[field] = default_value
