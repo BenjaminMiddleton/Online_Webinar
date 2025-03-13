@@ -69,15 +69,14 @@ function App() {
   }, []);
 
   return (
-    <MeetingProvider>
+    <div className="scale-container">
       <Routes>
         <Route path="/" element={<MinutesFrame />} />
-        <Route path="/meetings" element={<MeetingsFrame />} />
-        <Route path="/upload-test" element={<UploadTest />} />
-        <Route path="*" element={<Navigate to="/" />} />
+        <Route path="/action-points" element={<MinutesFrame />} />
       </Routes>
-    </MeetingProvider>
+    </div>
   );
 }
+
 
 export default App;
