@@ -1,5 +1,6 @@
-import React, { createContext, useContext, useState, ReactNode } from 'react';
+import React, { createContext, useContext, useState, ReactNode, useCallback, useEffect } from 'react';
 import { MinutesData } from '../api/apiService';
+import { getSocket } from '../api/socketService';
 
 // Define the context shape
 interface MeetingContextType {
@@ -64,6 +65,34 @@ export const MeetingProvider: React.FC<{ children: ReactNode }> = ({ children })
       }
     }
   }, [meetingData, activeJobId]);
+
+  const connectToSocket = useCallback(() => {
+    const s = getSocket();
+    if (!s) {
+      console.error("Failed to connect to socket");
+      return;
+    }
+    
+    // Set up socket event handlers
+    s.on('processing_complete', (data) => {
+      if (data && data.minutes) {
+        setMeetingData(data.minutes);
+        setActiveJobId(data.job_id);
+      }
+    });
+    
+    return () => {
+      const currentSocket = getSocket();
+      if (currentSocket) {
+        currentSocket.off('processing_complete');
+      }
+    };
+  }, [setMeetingData, setActiveJobId]);
+
+  useEffect(() => {
+    const cleanup = connectToSocket();
+    return cleanup;
+  }, [connectToSocket]);
 
   return (
     <MeetingContext.Provider value={{

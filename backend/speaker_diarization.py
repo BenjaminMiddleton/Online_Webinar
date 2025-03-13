@@ -43,8 +43,13 @@ diarization_pipeline = None
 logger = logging.getLogger(__name__)
 
 def load_models():
-    """Loads the Whisper and Pyannote models."""
     global whisper_model, diarization_pipeline
+    if not whisper_model:
+        whisper_model = WhisperModel(
+            "whisper-large-v2",  
+            device="cuda",
+            compute_type="float32",
+        )
     try:
         # CPU fallback
         print("Loading model with CPU int8...")

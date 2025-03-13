@@ -4,7 +4,8 @@ import ButtonCopy from "./ButtonCopy";
 import ActionPoint from "./ActionPoint";
 import AddActionPointText from "./AddActionPointText";
 import styles from "./MinutesContentBox.module.css";
-import { useMeetingContext } from "../context/MeetingContext"; // Add this import
+import { useMeetingContext } from "../context/MeetingContext";
+import { getJobStatus } from "../api/apiService"; // Add missing import
 
 // Keep type but modify to use simpler structure
 type ActionPoint = string;
@@ -208,9 +209,13 @@ const MinutesContentBox: FunctionComponent<MinutesContentBoxType> = ({
             
             // Update the context
             setMeetingData(data.minutes);
+          } else if (data.status === 'error') {
+            console.error(`Error fetching job data: ${data.error}`);
+            // Display error state if needed
           }
         } catch (error) {
           console.error('MinutesContentBox: Failed to fetch job data:', error);
+          // Handle fetch errors gracefully
         }
       };
       

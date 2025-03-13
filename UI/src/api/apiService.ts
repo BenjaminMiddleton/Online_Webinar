@@ -1,6 +1,6 @@
 /// <reference types="vite/client" />
-import { io } from "socket.io-client";
 import type { Socket as SocketType } from "socket.io-client";
+import { getSocket } from './socketService';
 
 // Determine if we're in production mode
 const isProduction = import.meta.env.VITE_ENV === 'production' || !import.meta.env.VITE_ENV;
@@ -11,14 +11,9 @@ const API_URL = isProduction
   ? '' // Empty string means use relative URLs (same origin)
   : (import.meta.env.VITE_API_URL || 'http://localhost:5000');
 
-const SOCKET_URL = isProduction
-  ? window.location.origin // Use current origin for WebSockets in production
-  : (import.meta.env.VITE_SOCKET_URL || 'http://localhost:5000');
-
 // For debugging
-console.log('Environment:', isProduction ? 'production' : 'development');
-console.log('Using API URL:', API_URL);
-console.log('Using Socket URL:', SOCKET_URL);
+console.log('API Service - Environment:', isProduction ? 'production' : 'development');
+console.log('API Service - Using API URL:', API_URL);
 
 // Define the MinutesData interface for type checking
 export interface MinutesData {
@@ -40,36 +35,6 @@ export interface JobResponse {
   error?: string;
   timestamp?: string;
   pdf_path?: string;
-}
-
-// Socket.IO connection singleton
-let socket!: SocketType;
-
-/**
- * Initialize and get a singleton Socket.IO connection
- */
-export function getSocket() {
-  if (!socket) {
-    socket = io(SOCKET_URL, {
-      path: '/socket.io',
-      transports: ['polling', 'websocket'], // Allow both transports for better compatibility
-      reconnection: true,
-      reconnectionAttempts: 10,
-      reconnectionDelay: 1000,
-      timeout: 20000,
-    });
-    
-    // Set up default listeners for logging/debugging
-    socket.on('connect', () => {
-      console.log('Socket connected:', socket.id);
-    });
-    
-    socket.on('connect_error', (err: any) => {
-      console.error('Socket connection error:', err);
-    });
-  }
-  
-  return socket;
 }
 
 /**
@@ -153,6 +118,10 @@ export function joinJobRoom(jobId: string, onUpdate?: (data: any) => void, onCom
   }
 
   const s = getSocket();
+  if (!s) {
+    console.error("Cannot join job room: Socket connection not established");
+    return () => {};
+  }
   
   // Clean up any existing listeners to prevent duplicates
   s.off('processing_update');
@@ -187,9 +156,13 @@ export function joinJobRoom(jobId: string, onUpdate?: (data: any) => void, onCom
   
   // Return cleanup function
   return () => {
-    console.log('Leaving job room:', jobId);
-    s.off('processing_update');
-    s.off('processing_complete');
-    s.off('processing_error');
+    // Get fresh socket reference in case it was reconnected
+    const currentSocket = getSocket();
+    if (currentSocket) {
+      console.log('Leaving job room:', jobId);
+      currentSocket.off('processing_update');
+      currentSocket.off('processing_complete');
+      currentSocket.off('processing_error');
+    }
   };
 }

@@ -1,6 +1,6 @@
 import React, { useRef, useState, useEffect } from 'react';
 import './ButtonNavBar.css';
-import io from 'socket.io-client';
+import { getSocket } from '../api/socketService';
 
 // Define the MinutesData interface if it's not imported
 export interface MinutesData {
@@ -98,104 +98,95 @@ const FilesIcon: React.FC<FilesIconProps> = ({ onFileSelect, onClick, onProcessi
 
   useEffect(() => {
     // Initialize socket connection
-    socketRef.current = io('http://localhost:5000', {
-      transports: ['websocket', 'polling'],
-      reconnection: true,
-      reconnectionAttempts: 10,
-      reconnectionDelay: 1000,
-      timeout: 20000
-    });
+    socketRef.current = getSocket();
 
-    // Set up connection event handlers
-    socketRef.current.on('connect', () => {
-      console.log('Socket.IO connected with ID:', socketRef.current.id);
-      setError(null);
-    });
-
-    socketRef.current.on('connect_error', (err: any) => {
-      console.error('Socket.IO connection error:', err);
-      setError('Connection error: Unable to reach the server');
-    });
-
-    socketRef.current.on('disconnect', (reason: string) => {
-      console.log('Socket.IO disconnected:', reason);
-      if (reason === 'io server disconnect') {
-        socketRef.current.connect();
-      }
-    });
-
-    // Set up processing event handlers
-    socketRef.current.on('processing_update', (data: any) => {
-      console.log('Processing update:', data);
-      if (data.job_id === jobId) {
-        setProcessingStatus(data.status);
-      }
-    });
-
-    socketRef.current.on('processing_complete', (data: any) => {
-      console.log('Processing complete:', data);
+    if (socketRef.current) {
+      // Only set up event handlers if socket is available
+      socketRef.current.on('connect', () => {
+        console.log('Socket.IO connected with ID:', socketRef.current?.id);
+        setError(null);
+      });
+  
+      socketRef.current.on('connect_error', (err: any) => {
+        console.error('Socket.IO connection error:', err);
+        setError('Connection error: Unable to reach the server');
+      });
       
-      if (!data || typeof data !== 'object') {
-        console.error('Invalid data received from server');
-        return;
-      }
-      
-      if (data.job_id === jobId) {
-        setProcessingStatus('completed');
-        setUploading(false);
+      // Set up processing event handlers
+      socketRef.current.on('processing_update', (data: any) => {
+        console.log('Processing update:', data);
+        if (data.job_id === jobId) {
+          setProcessingStatus(data.status);
+        }
+      });
+  
+      socketRef.current.on('processing_complete', (data: any) => {
+        console.log('Processing complete:', data);
         
-        // Store job data in localStorage for persistence
-        if (data.job_id) {
-          localStorage.setItem('lastJobId', data.job_id);
-          try {
-            localStorage.setItem('lastJobData', JSON.stringify(data));
-          } catch (e) {
-            console.error('Error storing job data in localStorage:', e);
+        if (!data || typeof data !== 'object') {
+          console.error('Invalid data received from server');
+          return;
+        }
+        
+        if (data.job_id === jobId) {
+          setProcessingStatus('completed');
+          setUploading(false);
+          
+          // Store job data in localStorage for persistence
+          if (data.job_id) {
+            localStorage.setItem('lastJobId', data.job_id);
+            try {
+              localStorage.setItem('lastJobData', JSON.stringify(data));
+            } catch (e) {
+              console.error('Error storing job data in localStorage:', e);
+            }
           }
-        }
-        
-        // Call onNewJobCreated callback
-        if (onNewJobCreated && data.job_id) {
-          onNewJobCreated(data.job_id, data);
-        }
-        
-        // Validate minutes data before passing to callback
-        if (onProcessingComplete && data.minutes) {
-          try {
-            const validatedMinutes: MinutesData = {
-              title: data.minutes.title || '',
-              duration: data.minutes.duration || '00:00',
-              summary: data.minutes.summary || '',
-              action_points: Array.isArray(data.minutes.action_points) ? data.minutes.action_points : [],
-              transcription: data.minutes.transcription || '',
-              speakers: Array.isArray(data.minutes.speakers) ? data.minutes.speakers : [],
-              pdf_path: data.pdf_path || data.minutes.pdf_path || '',
-            };
-            
-            onProcessingComplete(validatedMinutes);
-          } catch (e) {
-            console.error('Error processing minutes data:', e);
-            if (onProcessingError) {
-              onProcessingError('Error processing minutes data');
+          
+          // Call onNewJobCreated callback
+          if (onNewJobCreated && data.job_id) {
+            onNewJobCreated(data.job_id, data);
+          }
+          
+          // Validate minutes data before passing to callback
+          if (onProcessingComplete && data.minutes) {
+            try {
+              const validatedMinutes: MinutesData = {
+                title: data.minutes.title || '',
+                duration: data.minutes.duration || '00:00',
+                summary: data.minutes.summary || '',
+                action_points: Array.isArray(data.minutes.action_points) ? data.minutes.action_points : [],
+                transcription: data.minutes.transcription || '',
+                speakers: Array.isArray(data.minutes.speakers) ? data.minutes.speakers : [],
+                pdf_path: data.pdf_path || data.minutes.pdf_path || '',
+              };
+              
+              onProcessingComplete(validatedMinutes);
+            } catch (e) {
+              console.error('Error processing minutes data:', e);
+              if (onProcessingError) {
+                onProcessingError('Error processing minutes data');
+              }
             }
           }
         }
-      }
-    });
-    
-    socketRef.current.on('processing_error', (data: any) => {
-      console.error('Processing error:', data);
-      if (data.job_id === jobId) {
-        const errorMessage = data.error || 'An error occurred during processing';
-        setError(errorMessage);
-        setProcessingStatus('error');
-        setUploading(false);
-        
-        if (onProcessingError) {
-          onProcessingError(errorMessage);
+      });
+      
+      socketRef.current.on('processing_error', (data: any) => {
+        console.error('Processing error:', data);
+        if (data.job_id === jobId) {
+          const errorMessage = data.error || 'An error occurred during processing';
+          setError(errorMessage);
+          setProcessingStatus('error');
+          setUploading(false);
+          
+          if (onProcessingError) {
+            onProcessingError(errorMessage);
+          }
         }
-      }
-    });
+      });
+    } else {
+      setError('Unable to establish WebSocket connection');
+    }
     
     // Clean up on unmount
     return () => {
