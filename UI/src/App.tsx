@@ -73,10 +73,10 @@ function App() {
       <Routes>
         <Route path="/" element={<MinutesFrame />} />
         <Route path="/action-points" element={<MinutesFrame />} />
+        <Route path="/meetings" element={<MeetingsFrame />} /> {/* Add this line */}
       </Routes>
     </div>
   );
 }
-
 
 export default App;
