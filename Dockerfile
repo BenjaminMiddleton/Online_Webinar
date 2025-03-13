@@ -60,9 +60,9 @@ ENV NODE_ENV=development
 COPY UI/package*.json ./
 RUN npm ci --prefer-offline --no-audit --progress=false
 
-# Check typescript compilation first
-RUN echo "Running TypeScript check..." && \
-    npx tsc --noEmit || echo "TypeScript errors detected but continuing build"
+# Commented out TypeScript check to prevent duplication with Vite
+# RUN echo "Running TypeScript check..." && \
+#     npx tsc --noEmit || echo "TypeScript errors detected but continuing build"
 
 # Run the build with detailed diagnostic information
 RUN echo "Running Vite build with diagnostics..." && \
