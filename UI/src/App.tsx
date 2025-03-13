@@ -1,26 +1,29 @@
-import React from "react";
+import React, { useEffect } from "react";
 import {
   Routes,
   Route,
+  Navigate,
   useNavigationType,
   useLocation,
 } from "react-router-dom";
 import MinutesFrame from "./pages/MinutesFrame";
 import MeetingsFrame from "./pages/MeetingsFrame";
-import UploadTest from "./components/UploadTest"; // Import the test component
+import UploadTest from "./components/UploadTest"; 
+import { MeetingProvider } from './context/MeetingContext';
+import "./global.css";
 
 function App() {
   const action = useNavigationType();
   const location = useLocation();
   const pathname = location.pathname;
 
-  React.useEffect(() => {
+  useEffect(() => {
     if (action !== "POP") {
       window.scrollTo(0, 0);
     }
   }, [action, pathname]);
 
-  React.useEffect(() => {
+  useEffect(() => {
     let title = "";
     let metaDescription = "";
 
@@ -61,12 +64,19 @@ function App() {
     }
   }, [pathname]);
 
+  useEffect(() => {
+    document.title = "Meeting Minutes";
+  }, []);
+
   return (
-    <Routes>
-      <Route path="/" element={<MinutesFrame />} />
-      <Route path="/meetings" element={<MeetingsFrame />} />
-      <Route path="/upload-test" element={<UploadTest />} />
-    </Routes>
+    <MeetingProvider>
+      <Routes>
+        <Route path="/" element={<MinutesFrame />} />
+        <Route path="/meetings" element={<MeetingsFrame />} />
+        <Route path="/upload-test" element={<UploadTest />} />
+        <Route path="*" element={<Navigate to="/" />} />
+      </Routes>
+    </MeetingProvider>
   );
 }
 

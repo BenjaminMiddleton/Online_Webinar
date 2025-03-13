@@ -25,36 +25,41 @@ const TranscriptBox: React.FC<TranscriptBoxType> = ({
   jobId = null
 }) => {
   const [collapsed, setCollapsed] = useState(false);
-  const [transcript, setTranscript] = useState(transcription);
-  const [speakerList, setSpeakerList] = useState(speakers);
-  const [loading, setLoading] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
+  const [transcript, setTranscript] = useState<string>(transcription);
+  const [speakerList, setSpeakerList] = useState<string[]>(speakers);
+  const [isLoading, setIsLoading] = useState<boolean>(false);
   const [loadError, setLoadError] = useState<string | null>(null);
-  const hasLogged = useRef(false);
-  const { meetingData, setMeetingData } = useMeetingContext(); // NEW
-
-  // New effect: update transcript from meeting context when available
+  const { meetingData, setMeetingData } = useMeetingContext();
+  const hasInitialized = useRef(false);
+  
+  // Simplified effect to prevent console spam
   useEffect(() => {
+    // If we already have transcription passed as prop, use it
+    if (transcription && transcription.trim() !== "") {
+      setTranscript(transcription);
+      hasInitialized.current = true;
+      return;
+    }
+    
+    // If we have meeting data in context with a transcript, use it
     if (meetingData && meetingData.transcription && meetingData.transcription.trim() !== "") {
-      console.log("TranscriptBox: Updating transcript from MeetingContext");
       setTranscript(meetingData.transcription);
       if (meetingData.speakers && meetingData.speakers.length > 0) {
         setSpeakerList(meetingData.speakers);
       }
+      hasInitialized.current = true;
+      return;
     }
-  }, [meetingData]);
-
-  // Enhanced useEffect for better error handling
-  useEffect(() => {
-    if (jobId) {
-      let pollInterval: ReturnType<typeof setInterval>;
+    
+    // Only fetch from API if we have jobId and haven't initialized yet
+    if (jobId && !hasInitialized.current) {
+      setIsLoading(true);
+      setLoadError(null);
+      
       const fetchTranscript = async () => {
         try {
-          setIsLoading(true);
-          setLoadError(null);
-          console.log(`TranscriptBox: Fetching data for job ${jobId}`);
           const result = await getJobStatus(jobId);
-          console.log("TranscriptBox: Received result", result);
+          
           if (
             result.status === 'completed' &&
             result.minutes &&
@@ -65,44 +70,45 @@ const TranscriptBox: React.FC<TranscriptBoxType> = ({
             if (result.minutes.speakers && result.minutes.speakers.length > 0) {
               setSpeakerList(result.minutes.speakers);
             }
+            // Update the context too
             setMeetingData(result.minutes);
-            clearInterval(pollInterval);
+            hasInitialized.current = true;
           } else {
-            // Fallback: check localStorage for stored job data
+            // Check localStorage as fallback
             const localData = getLastJobData();
             if (
               localData.jobId === jobId &&
               localData.jobData &&
               localData.jobData.minutes &&
-              localData.jobData.minutes.transcription &&
-              localData.jobData.minutes.transcription.trim().length > 0
+              localData.jobData.minutes.transcription
             ) {
-              console.log(`TranscriptBox: Using transcript from localStorage for job ${jobId}`);
               setTranscript(localData.jobData.minutes.transcription);
-              setLoadError(null);  // Clear error if transcript exists
+              hasInitialized.current = true;
             } else {
-              setLoadError('Job is still processing. Please wait...');
+              setLoadError('Transcript not available yet');
             }
           }
         } catch (error) {
-          console.error("Failed to fetch transcript data:", error);
-          setLoadError('Failed to load the transcript. Please try again.');
+          console.error("Failed to fetch transcript:", error);
+          setLoadError('Failed to load transcript');
         } finally {
           setIsLoading(false);
         }
       };
+      
       fetchTranscript();
-      pollInterval = setInterval(fetchTranscript, 10000);
-      return () => clearInterval(pollInterval);
     }
-  }, [jobId]); // removed transcript from dependency array
-
-  // Compute transcript to display: from context if available, else local state
-  const displayTranscript = meetingData && meetingData.transcription.trim() !== ""
-    ? meetingData.transcription
-    : transcript;
-
-  console.log("Rendering TranscriptBox with transcript:", displayTranscript);
+  }, [jobId, transcription, meetingData, setMeetingData]);
+  
+  // Use a simple variable for displaying transcript instead of duplicating state
+  const displayTranscript = transcript;
+  
+  // Only log once when component renders, not on every render
+  useEffect(() => {
+    if (displayTranscript) {
+      console.log("TranscriptBox: Transcript loaded successfully");
+    }
+  }, []);
 
   return (
     <div
@@ -137,15 +143,25 @@ const TranscriptBox: React.FC<TranscriptBoxType> = ({
               <div className={styles.searchBox}>
                 <div className={styles.searchText}>
                   <div className={styles.symbolSearchSmall}>
-                    <svg width="34" height="34" viewBox="0 0 34 34" xmlns="http://www.w3.org/2000/svg">
-                      <path d="M24.5182 22.7084L30 28.1889L28.1889 30L22.7084 24.5182C20.6692 26.1529 18.1327 27.042 15.5191 27.0383C9.16058 27.0383 4 21.8777 4 15.5191C4 9.16058 9.16058 4 15.5191 4C21.8777 4 27.0383 9.16058 27.0383 15.5191C27.042 18.1327 26.1529 20.6692 24.5182 22.7084ZM21.9507 21.7587C23.5747 20.088 24.4817 17.849 24.4785 15.5191C24.4785 10.5698 20.4685 6.55981 15.5191 6.55981C10.5698 6.55981 6.55981 10.5698 6.55981 15.5191C6.55981 20.4685 10.5698 24.4785 15.5191 24.4785C17.849 24.4817 20.088 23.5747 21.7587 21.9507L21.9507 21.7587Z" fill="#A4A4A4"/>
-                    </svg>
+                    {/* ...existing SVG code... */}
                   </div>
                   <input className={styles.search} placeholder="Search..." />
                 </div>
               </div>
               
-              {/* Removed speakers display section while keeping the underlying speakerList variable */}
+              {/* Display speakers if available */}
+              {speakerList && speakerList.length > 0 && (
+                <div className={styles.speakersSection}>
+                  <div className={styles.speakersLabel}>Speakers:</div>
+                  <div className={styles.speakersList}>
+                    {speakerList.map((speaker, index) => (
+                      <div key={index} className={styles.speakerItem}>
+                        {speaker}
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
               
               <div className={styles.replyBox} style={{ height: 'auto' }}>
                 <div className={styles.questionText}>

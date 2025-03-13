@@ -4,6 +4,7 @@ import ButtonCopy from "./ButtonCopy";
 import ActionPoint from "./ActionPoint";
 import AddActionPointText from "./AddActionPointText";
 import styles from "./MinutesContentBox.module.css";
+import { useMeetingContext } from "../context/MeetingContext"; // Add this import
 
 // Keep type but modify to use simpler structure
 type ActionPoint = string;
@@ -83,8 +84,35 @@ const MinutesContentBox: FunctionComponent<MinutesContentBoxType> = ({
   const [isLockClicked, setIsLockClicked] = useState<boolean>(false);
   const [isLockHovered, setIsLockHovered] = useState<boolean>(false);
 
-  // Add effect to use direct data if provided
+  // Add meeting context
+  const { meetingData, setMeetingData, activeJobId } = useMeetingContext();
+
+  // Enhanced useEffect for data handling
   useEffect(() => {
+    // If we have a meetingData from context and it matches our jobId, use it
+    if (meetingData && activeJobId === jobId) {
+      console.log('MinutesContentBox: Using data from context');
+      
+      if (meetingData.title) {
+        setTitle(meetingData.title);
+      }
+      
+      if (meetingData.duration) {
+        setDuration(meetingData.duration);
+      }
+      
+      if (meetingData.summary) {
+        setSummary(meetingData.summary);
+      }
+      
+      if (meetingData.action_points && Array.isArray(meetingData.action_points)) {
+        setActionPoints(meetingData.action_points);
+      }
+      
+      return; // Skip rest of effect if using context data
+    }
+    
+    // If we have direct data passed as prop, use it
     if (directData) {
       console.log('MinutesContentBox: Using direct data');
       
@@ -109,120 +137,86 @@ const MinutesContentBox: FunctionComponent<MinutesContentBoxType> = ({
         localStorage.setItem('actionPoints', JSON.stringify(directData.action_points));
       }
       
-      // No need to fetch from API since we have direct data
-      return;
+      return; // Skip API call if we have direct data
     }
     
-    // Use individual props if provided
-    if (titleText) setTitle(titleText);
-    if (durationText) setDuration(durationText);
-    if (summaryText && summaryText !== "No summary available") setSummary(summaryText);
-    if (transcriptText) setTranscript(transcriptText);
+    // Use individual props if provided (with clear logging)
+    if (titleText) {
+      console.log('MinutesContentBox: Setting title from prop:', titleText);
+      setTitle(titleText);
+    }
+    
+    if (durationText) {
+      console.log('MinutesContentBox: Setting duration from prop:', durationText);
+      setDuration(durationText);
+    }
+    
+    if (summaryText && summaryText !== "No summary available") {
+      console.log('MinutesContentBox: Setting summary from prop:', summaryText.substring(0, 30) + '...');
+      setSummary(summaryText);
+    }
+    
+    if (transcriptText) {
+      setTranscript(transcriptText);
+    }
+    
     if (propActionPoints && propActionPoints.length > 0) {
+      console.log('MinutesContentBox: Setting action points from props:', propActionPoints);
       setActionPoints(propActionPoints);
       localStorage.setItem('actionPoints', JSON.stringify(propActionPoints));
     }
     
-    console.log(`MinutesContentBox: initializing with jobId=${jobId}, summary=${summaryText?.substring(0, 20)}...`);
-    
-    // If we don't have direct data but we have a jobId, fetch from API (existing code)
-    const fetchJobData = async () => {
-      try {
-        // If we have a jobId, fetch from backend API
-        if (jobId) {
-          console.log(`MinutesContentBox: Fetching data for job ${jobId}`);
-          const response = await fetch(`http://localhost:5000/job_status/${jobId}`);
-          if (!response.ok) {
-            throw new Error(`Failed to fetch job status: ${response.statusText}`);
-          }
+    // If we have a jobId, fetch from API
+    if (jobId) {
+      console.log(`MinutesContentBox: Fetching data for job ${jobId}`);
+      
+      const fetchJobData = async () => {
+        try {
+          const data = await getJobStatus(jobId);
+          console.log("MinutesContentBox: Received job data:", data);
           
-          const data = await response.json();
-          console.log('MinutesContentBox: Received job data:', data);
-          
-          // Check if job status is completed and minutes are available
           if (data.status === 'completed' && data.minutes) {
-            // Update component state with data from backend
+            // Update our local state
             if (data.minutes.title) {
-              console.log(`MinutesContentBox: Setting title to "${data.minutes.title}"`);
+              console.log(`MinutesContentBox: Setting title from API: ${data.minutes.title}`);
               setTitle(data.minutes.title);
             }
+            
             if (data.minutes.duration) {
-              console.log(`MinutesContentBox: Setting duration to "${data.minutes.duration}"`);
+              console.log(`MinutesContentBox: Setting duration from API: ${data.minutes.duration}`);
               setDuration(data.minutes.duration);
             }
+            
             if (data.minutes.summary) {
-              console.log(`MinutesContentBox: Setting summary from job data`);
+              console.log(`MinutesContentBox: Setting summary from API: ${data.minutes.summary.substring(0, 30)}...`);
               setSummary(data.minutes.summary);
             }
+            
             if (data.minutes.transcription) {
-              console.log(`MinutesContentBox: Setting transcript from job data`);
               setTranscript(data.minutes.transcription);
             }
             
             // Transform backend action points to match our format
             if (data.minutes.action_points && Array.isArray(data.minutes.action_points)) {
               const points = data.minutes.action_points.filter((p: string) => p && typeof p === 'string');
-              console.log(`MinutesContentBox: Setting ${points.length} action points from job data`);
+              console.log(`MinutesContentBox: Setting ${points.length} action points from API`);
               setActionPoints(points);
               
               // Save to localStorage as a cache
               localStorage.setItem('actionPoints', JSON.stringify(points));
             }
-          } else {
-            console.log(`MinutesContentBox: Job not completed (${data.status}) or no minutes available`);
-            // Fall back to localStorage if available
-            const saved = localStorage.getItem('actionPoints');
-            if (saved) {
-              try {
-                const parsed = JSON.parse(saved);
-                if (Array.isArray(parsed)) {
-                  setActionPoints(parsed);
-                }
-              } catch (e) {
-                console.error('Failed to parse saved action points:', e);
-              }
-            }
+            
+            // Update the context
+            setMeetingData(data.minutes);
           }
-        } else {
-          // No jobId provided, fall back to localStorage
-          console.log('MinutesContentBox: No jobId provided, checking localStorage for action points');
-          const saved = localStorage.getItem('actionPoints');
-          if (saved) {
-            try {
-              const parsed = JSON.parse(saved);
-              if (Array.isArray(parsed)) {
-                setActionPoints(parsed);
-              }
-            } catch (e) {
-              console.error('Failed to parse saved action points:', e);
-            }
-          }
+        } catch (error) {
+          console.error('MinutesContentBox: Failed to fetch job data:', error);
         }
-      } catch (error) {
-        console.error('MinutesContentBox: Failed to fetch job data:', error);
-        // Fall back to localStorage if API call fails
-        const saved = localStorage.getItem('actionPoints');
-        if (saved) {
-          try {
-            const parsed = JSON.parse(saved);
-            if (Array.isArray(parsed)) {
-              setActionPoints(parsed);
-            }
-          } catch (e) {
-            console.error('Failed to parse saved action points:', e);
-          }
-        }
-      }
-    };
-
-    // Update summary from prop if provided
-    if (summaryText && summaryText !== "No") {
-      console.log(`MinutesContentBox: Setting summary from prop: ${summaryText.substring(0, 20)}...`);
-      setSummary(summaryText);
+      };
+      
+      fetchJobData();
     }
-    
-    fetchJobData();
-  }, [jobId, summaryText, directData, propActionPoints, titleText, durationText, transcriptText]); // Run when jobId or summaryText changes
+  }, [jobId, directData, propActionPoints, titleText, durationText, summaryText, transcriptText, meetingData, activeJobId, setMeetingData]);
 
   // Modify existing functions to handle backend
   const addActionPoint = useCallback(async (e?: React.MouseEvent | React.KeyboardEvent) => {

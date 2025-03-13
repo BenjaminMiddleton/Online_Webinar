@@ -1,5 +1,6 @@
 /// <reference types="vite/client" />
-import { io, Socket } from 'socket.io-client';
+import { io } from "socket.io-client";
+import type { Socket as SocketType } from "socket.io-client";
 
 // Use environment variables with fallbacks for local development
 export const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
@@ -18,7 +19,7 @@ export interface MinutesData {
   transcription: string;
   speakers: string[];
   pdf_path?: string;
-  job_id?: string; // Added job id to track processing results
+  job_id?: string;
 }
 
 // Define interfaces for job data
@@ -32,7 +33,7 @@ export interface JobResponse {
 }
 
 // Socket.IO connection singleton
-let socket!: Socket;
+let socket!: SocketType;
 
 /**
  * Initialize and get a singleton Socket.IO connection
@@ -41,12 +42,11 @@ export function getSocket() {
   if (!socket) {
     socket = io(SOCKET_URL, {
       path: '/socket.io',
-      transports: ['polling'], // Force polling transport only
+      transports: ['polling', 'websocket'], // Allow both transports for better compatibility
       reconnection: true,
       reconnectionAttempts: 10,
       reconnectionDelay: 1000,
       timeout: 20000,
-      upgrade: false    // Disable upgrade to WebSocket
     });
     
     // Set up default listeners for logging/debugging
@@ -59,7 +59,7 @@ export function getSocket() {
     });
   }
   
-  return socket; // Now safe as socket is never null
+  return socket;
 }
 
 /**
@@ -130,21 +130,50 @@ export function getLastJobData(): { jobId: string | null, jobData: any | null } 
 }
 
 /**
- * Join a specific job for real-time updates
+ * Join a specific job for real-time updates with improved error handling
  */
-export function joinJobRoom(jobId: string, onUpdate?: (data: any) => void, onComplete?: (data: any) => void) {
+export function joinJobRoom(jobId: string, onUpdate?: (data: any) => void, onComplete?: (data: any) => void, onError?: (error: string) => void) {
+  if (!jobId) {
+    console.error("Cannot join job room: No job ID provided");
+    return () => {};
+  }
+
   const s = getSocket();
+  
+  // Clean up any existing listeners to prevent duplicates
   s.off('processing_update');
   s.off('processing_complete');
   s.off('processing_error');
+  
+  // Set up new listeners
   if (onUpdate) {
-    s.on('processing_update', (data: any) => { if (data.job_id === jobId) onUpdate(data); });
+    s.on('processing_update', (data: any) => { 
+      if (data && data.job_id === jobId) onUpdate(data); 
+    });
   }
+  
   if (onComplete) {
-    s.on('processing_complete', (data: any) => { if (data.job_id === jobId) onComplete(data); });
+    s.on('processing_complete', (data: any) => { 
+      if (data && data.job_id === jobId) {
+        console.log('Received processing_complete for job:', jobId, data);
+        onComplete(data); 
+      }
+    });
   }
+  
+  if (onError) {
+    s.on('processing_error', (data: any) => {
+      if (data && data.job_id === jobId) onError(data.error || 'Unknown error');
+    });
+  }
+  
+  // Join the room
+  console.log('Joining job room:', jobId);
   s.emit('rejoin_job', { job_id: jobId });
+  
+  // Return cleanup function
   return () => {
+    console.log('Leaving job room:', jobId);
     s.off('processing_update');
     s.off('processing_complete');
     s.off('processing_error');
