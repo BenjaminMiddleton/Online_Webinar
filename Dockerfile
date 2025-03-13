@@ -43,36 +43,39 @@ RUN apt-get update && apt-get install -y curl && \
     curl -fsSL https://deb.nodesource.com/setup_18.x | bash - && \
     apt-get install -y nodejs
 
-# Build the React UI
+# Set up proper build environment for the React UI
 WORKDIR ${APP_HOME}/UI
-COPY UI/package*.json ./
-RUN npm install
 
-# Capture verbose output from npm run build
-RUN npm run build --verbose 2>&1 | tee build_log.txt
+# Ensure correct Node.js and npm versions
+RUN node --version && npm --version
 
-# Check the build output directory structure
-RUN ls -la && echo "Checking for build output directories..." && \
-    (ls -la dist || echo "dist directory not found") && \
-    (ls -la build || echo "build directory not found")
+# Set production environment for better optimization
+ENV NODE_ENV=production
+
+# Create a proper .env file for the build
+RUN echo "VITE_API_URL=" > .env.production && \
+    echo "VITE_SOCKET_URL=" >> .env.production && \
+    echo "VITE_ENV=production" >> .env.production
+
+# Install dependencies with clean cache
+RUN npm cache clean --force && \
+    npm install
+
+# Check typescript compilation first
+RUN echo "Running TypeScript check..." && \
+    npx tsc --noEmit || echo "TypeScript errors detected but continuing build"
+
+# Run the build with detailed diagnostic information
+RUN echo "Running Vite build with diagnostics..." && \
+    VITE_DEBUG=true npm run build -- --debug
+
+# Verify the build output
+RUN ls -la dist || (echo "Build failed to create dist directory. See errors above." && exit 1)
 
 # Copy static files from UI build to backend static folder
 WORKDIR ${APP_HOME}
 RUN mkdir -p backend/static
-
-# Check for both common build output directories (dist or build)
-RUN if [ -d "UI/dist" ]; then \
-        echo "Found UI/dist directory, copying files..."; \
-        cp -r UI/dist/* backend/static/; \
-    elif [ -d "UI/build" ]; then \
-        echo "Found UI/build directory, copying files..."; \
-        cp -r UI/build/* backend/static/; \
-    else \
-        echo "ERROR: Neither UI/dist nor UI/build directory exists. Build may have failed."; \
-        echo "Contents of UI directory:"; \
-        ls -la UI/; \
-        exit 1; \
-    fi
+RUN cp -r UI/dist/* backend/static/
 
 # Change working directory back to backend
 WORKDIR ${APP_HOME}/backend
