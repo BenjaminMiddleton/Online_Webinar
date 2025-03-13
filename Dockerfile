@@ -57,9 +57,12 @@ RUN echo "VITE_API_URL=" > .env.production && \
     echo "VITE_SOCKET_URL=" >> .env.production && \
     echo "VITE_ENV=production" >> .env.production
 
-# Install dependencies with clean cache
-RUN npm cache clean --force && \
-    npm install
+# Configure npm to avoid cache-related issues in Docker environments
+RUN npm config set cache /tmp/.npm --global
+
+# Install dependencies using ci for more reliable builds
+COPY UI/package*.json ./
+RUN npm ci --prefer-offline --no-audit --progress=false
 
 # Check typescript compilation first
 RUN echo "Running TypeScript check..." && \
