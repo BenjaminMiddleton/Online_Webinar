@@ -25,10 +25,6 @@ ENV PYTHON_VERSION 3.12.9
 # Update pip
 RUN pip3 install --no-cache-dir --upgrade pip
 
-# Reinstall tokenizers
-RUN pip3 uninstall -y tokenizers
-RUN pip3 install --no-cache-dir tokenizers
-
 # Copy requirements file
 COPY requirements.txt .
 
@@ -49,9 +45,6 @@ WORKDIR ${APP_HOME}/UI
 # Ensure correct Node.js and npm versions
 RUN node --version && npm --version
 
-# Set production environment for better optimization
-ENV NODE_ENV=production
-
 # Create a proper .env file for the build
 RUN echo "VITE_API_URL=" > .env.production && \
     echo "VITE_SOCKET_URL=" >> .env.production && \
@@ -59,6 +52,9 @@ RUN echo "VITE_API_URL=" > .env.production && \
 
 # Configure npm to avoid cache-related issues in Docker environments
 RUN npm config set cache /tmp/.npm --global
+
+# Set development environment before installing dependencies
+ENV NODE_ENV=development
 
 # Install dependencies using ci for more reliable builds
 COPY UI/package*.json ./
@@ -71,6 +67,9 @@ RUN echo "Running TypeScript check..." && \
 # Run the build with detailed diagnostic information
 RUN echo "Running Vite build with diagnostics..." && \
     VITE_DEBUG=true npm run build -- --debug
+
+# Set production environment for better optimization
+ENV NODE_ENV=production
 
 # Verify the build output
 RUN ls -la dist || (echo "Build failed to create dist directory. See errors above." && exit 1)
