@@ -33,7 +33,7 @@ RUN pip3 install --no-cache-dir tokenizers
 COPY requirements.txt .
 
 # Install Python dependencies
-RUN pip3 install --no-cache-dir -r requirements.txt
+RUN pip3 install --no-cache-dir -r requirements-railway.txt
 
 # Copy the application code
 COPY . .
