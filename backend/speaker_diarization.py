@@ -46,7 +46,7 @@ def load_models():
     global whisper_model, diarization_pipeline
     if not whisper_model:
         whisper_model = WhisperModel(
-            "whisper-large-v2",  
+            "medium.en",  
             device="cuda",
             compute_type="float32",
         )
