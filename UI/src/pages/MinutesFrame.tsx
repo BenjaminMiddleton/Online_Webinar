@@ -169,7 +169,6 @@ const MinutesFrame: FunctionComponent = () => {
       <NavBar 
         onNewJobCreated={handleNewJobCreated}
         onArrowClick={handleNavigateToMeetings}
-        onLogout={handleLogout}
       />
       {loading && (
         <div className={styles.loadingOverlay}>
