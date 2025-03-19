@@ -82,10 +82,10 @@ const MeetingsContentBox: FunctionComponent<MeetingsContentBoxType> = ({
   const navigate = useNavigate();
 
   // Handle navigation to the MinutesFrame
-  const handleNavigateToMinutes = useCallback((e: React.MouseEvent) => {
-    e.stopPropagation(); // Prevent any parent accordion events from firing
-    navigate("/"); // Navigate to the MinutesFrame (root route)
-  }, [navigate]);
+  const handleNavigateToMinutes = () => {
+    console.log('Navigating to minutes frame');
+    navigate("/minutes");  // Changed from "/" to "/minutes"
+  };
 
   // Still use direct data to set title
   useEffect(() => {

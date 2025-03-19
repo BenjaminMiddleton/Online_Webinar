@@ -153,11 +153,23 @@ const MinutesFrame: FunctionComponent = () => {
     navigate("/meetings");
   };
 
+  // Add a new handler for logout functionality
+  const handleLogout = () => {
+    console.log("Logout button clicked in MinutesFrame");
+    // Clear any necessary session data
+    localStorage.removeItem('lastJobId');
+    localStorage.removeItem('lastJobData');
+    // Navigate to login page
+    navigate("/");
+  };
+
   return (
     <div className={styles.minutesFrame}>
+      {/* NavBar with logout prop */}
       <NavBar 
         onNewJobCreated={handleNewJobCreated}
         onArrowClick={handleNavigateToMeetings}
+        onLogout={handleLogout}
       />
       {loading && (
         <div className={styles.loadingOverlay}>

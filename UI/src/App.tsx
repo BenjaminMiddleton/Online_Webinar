@@ -8,6 +8,7 @@ import {
 } from "react-router-dom";
 import MinutesFrame from "./pages/MinutesFrame";
 import MeetingsFrame from "./pages/MeetingsFrame";
+import LogIn from "./pages/LogIn";
 import UploadTest from "./components/UploadTest"; 
 import { MeetingProvider } from './context/MeetingContext';
 import "./global.css";
@@ -29,6 +30,10 @@ function App() {
 
     switch (pathname) {
       case "/":
+        title = "Login";
+        metaDescription = "Login to Meeting Management.";
+        break;
+      case "/minutes":
         title = "Minutes Frame";
         metaDescription = "View and manage your minutes.";
         break;
@@ -45,8 +50,8 @@ function App() {
         metaDescription = "Test file upload functionality.";
         break;
       default:
-        title = "Minutes Frame";
-        metaDescription = "View and manage your minutes.";
+        title = "Meeting Management";
+        metaDescription = "Manage your meetings and minutes.";
         break;
     }
 
@@ -71,9 +76,10 @@ function App() {
   return (
     <div className="scale-container">
       <Routes>
-        <Route path="/" element={<MinutesFrame />} />
+        <Route path="/" element={<LogIn />} />
+        <Route path="/minutes" element={<MinutesFrame />} />
         <Route path="/action-points" element={<MinutesFrame />} />
-        <Route path="/meetings" element={<MeetingsFrame />} /> {/* Add this line */}
+        <Route path="/meetings" element={<MeetingsFrame />} />
       </Routes>
     </div>
   );

@@ -1,4 +1,5 @@
 import React, { FunctionComponent, useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import MeetingsNavBar from "../components/MeetingsNavBar";
 import MeetingsBox from "../components/MeetingsBox";
 import MeetingsChatBox from "../components/MeetingsChatBox";
@@ -6,6 +7,7 @@ import styles from "./MeetingsFrame.module.css";
 import { getLastJobData, joinJobRoom } from "../api/apiService";
 
 const MeetingsFrame: FunctionComponent = () => {
+  const navigate = useNavigate();
   const [leftWidth, setLeftWidth] = useState(50); // Initial width percentage for the left container
   const [isRightCollapsed, setIsRightCollapsed] = useState(true);
   const [activeJobId, setActiveJobId] = useState<string | null>(null);
@@ -147,7 +149,11 @@ const MeetingsFrame: FunctionComponent = () => {
 
   const handleLogout = () => {
     console.log("Logout button clicked");
-    // Implement logout functionality here
+    // Clear any necessary session data
+    localStorage.removeItem('lastJobId');
+    localStorage.removeItem('lastJobData');
+    // Navigate to login page
+    navigate("/");
   };
 
   const handleActionPoints = () => {
