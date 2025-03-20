@@ -1,19 +1,26 @@
 /// <reference types="vite/client" />
 import type { Socket as SocketType } from "socket.io-client";
 import { getSocket } from './socketService';
+import { mockMeetingData } from './mockData';
 
 // Determine if we're in production mode
 const isProduction = import.meta.env.VITE_ENV === 'production' || !import.meta.env.VITE_ENV;
 
+// Check if we're running on GitHub Pages (no backend available)
+const isGitHubPages = window.location.hostname.includes('github.io');
+
 // Use environment variables with fallbacks
 // In production with Railway, we can use relative URLs as the backend serves the frontend
-const API_URL = isProduction 
-  ? '' // Empty string means use relative URLs (same origin)
-  : (import.meta.env.VITE_API_URL || 'http://localhost:5000');
+const API_URL = isGitHubPages 
+  ? null // No API available on GitHub Pages
+  : isProduction 
+    ? '' // Empty string means use relative URLs (same origin)
+    : (import.meta.env.VITE_API_URL || 'http://localhost:5000');
 
 // For debugging
 console.log('API Service - Environment:', isProduction ? 'production' : 'development');
 console.log('API Service - Using API URL:', API_URL);
+console.log('API Service - GitHub Pages Mode:', isGitHubPages ? 'Yes (using mock data)' : 'No');
 
 // Define the MinutesData interface for type checking
 export interface MinutesData {
@@ -41,6 +48,17 @@ export interface JobResponse {
  * Upload a file to the backend
  */
 export async function uploadFile(file: File): Promise<JobResponse> {
+  if (isGitHubPages) {
+    console.log('GitHub Pages mode: Using mock data instead of API call');
+    // Return a mock job response
+    return {
+      status: "complete",
+      job_id: "mock_job_id",
+      minutes: mockMeetingData,
+      timestamp: new Date().toISOString()
+    };
+  }
+
   try {
     const formData = new FormData();
     formData.append('file', file);
