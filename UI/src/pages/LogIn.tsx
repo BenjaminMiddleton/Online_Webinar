@@ -82,13 +82,13 @@ const LogIn: FunctionComponent = () => {
     <div className={styles.loginContainer}>
       <div className={styles.patternContainer} ref={patternContainerRef}>
         <img 
-          src="/login-pattern.png" 
+          src={`${import.meta.env.BASE_URL}login-pattern.png`} 
           alt="Login pattern" 
           className={styles.patternImage}
         />
         <div className={styles.bottomContainer} ref={bottomContainerRef}>
           <div className={styles.brandingSvg}>
-            <img src="/branding.svg" alt="Branding Logo" style={{ height: '35px', width: 'auto', display: 'block' }} />
+            <img src={`${import.meta.env.BASE_URL}branding.svg`} alt="Branding Logo" style={{ height: '35px', width: 'auto', display: 'block' }} />
           </div>
         </div>
       </div>
