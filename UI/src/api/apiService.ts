@@ -53,9 +53,8 @@ export async function uploadFile(file: File): Promise<JobResponse> {
     // Return a mock job response
     return {
       status: "complete",
-      job_id: "mock_job_id",
-      minutes: mockMeetingData,
-      timestamp: new Date().toISOString()
+      job_id: "github-pages-mock-job",
+      minutes: mockMeetingData
     };
   }
 
@@ -87,6 +86,15 @@ export async function uploadFile(file: File): Promise<JobResponse> {
  * Get job status from the backend
  */
 export async function getJobStatus(jobId: string): Promise<JobResponse> {
+  if (isGitHubPages) {
+    console.log('GitHub Pages mode: Using mock data instead of API call');
+    return {
+      status: "complete",
+      job_id: jobId || "github-pages-mock-job",
+      minutes: mockMeetingData
+    };
+  }
+
   try {
     const response = await fetch(`${API_URL}/job_status/${jobId}`);
     
@@ -130,6 +138,24 @@ export function getLastJobData(): { jobId: string | null, jobData: any | null } 
  * Join a specific job for real-time updates with improved error handling
  */
 export function joinJobRoom(jobId: string, onUpdate?: (data: any) => void, onComplete?: (data: any) => void, onError?: (error: string) => void) {
+  if (isGitHubPages) {
+    console.log('GitHub Pages mode: Mock job room join');
+    
+    // Simulate a completed job with mock data after a short delay
+    setTimeout(() => {
+      const mockData = {
+        status: "complete",
+        job_id: jobId,
+        minutes: mockMeetingData
+      };
+      
+      if (onComplete) onComplete(mockData);
+    }, 500);
+    
+    // Return empty cleanup function
+    return () => {};
+  }
+
   if (!jobId) {
     console.error("Cannot join job room: No job ID provided");
     return () => {};

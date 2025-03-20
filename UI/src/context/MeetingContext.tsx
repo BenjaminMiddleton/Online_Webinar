@@ -74,7 +74,7 @@ export const MeetingProvider: React.FC<{ children: ReactNode }> = ({ children })
     }
     
     // Set up socket event handlers
-    s.on('processing_complete', (data) => {
+    s.on('processing_complete', (data: any) => {
       if (data && data.minutes) {
         setMeetingData(data.minutes);
         setActiveJobId(data.job_id);

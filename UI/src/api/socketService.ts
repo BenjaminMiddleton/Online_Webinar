@@ -20,12 +20,12 @@ console.log('Socket Service - Using Socket URL:', SOCKET_URL);
 console.log('Socket Service - GitHub Pages Mode:', isGitHubPages ? 'Yes (sockets disabled)' : 'No');
 
 // Socket.IO connection singleton
-let socket: Socket | null = null;
+let socket: ReturnType<typeof io> | null = null;
 
 /**
  * Initialize and get a singleton Socket.IO connection
  */
-export function getSocket(): Socket | null {
+export function getSocket(): ReturnType<typeof io> | null {
   // Don't even try to connect if on GitHub Pages
   if (isGitHubPages) {
     console.log('GitHub Pages mode: Socket connections disabled');
