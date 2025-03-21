@@ -96,52 +96,27 @@ export async function getJobStatus(jobId) {
  */
 export function getLastJobData() {
     try {
+        // Add this check to prevent returning the sample text
         const jobId = localStorage.getItem('lastJobId');
-        const jobDataStr = localStorage.getItem('lastJobData');
-        let jobData = null;
-        if (jobDataStr) {
-            try {
-                jobData = JSON.parse(jobDataStr);
-                // Validate the parsed data has required fields
-                if (!jobData || !jobData.minutes || !jobData.status) {
-                    throw new Error('Invalid job data structure');
-                }
+        const storedData = localStorage.getItem('lastJobData');
+        
+        if (storedData) {
+            const parsed = JSON.parse(storedData);
+            // Check if it contains the sample text and reject it if found
+            if (parsed && 
+                parsed.minutes && 
+                parsed.minutes.transcription && 
+                parsed.minutes.transcription.includes("This is a sample transcription for the demonstration")) {
+                console.log("Ignoring default sample text from localStorage");
+                return { jobId: null, jobData: null };
             }
-            catch (parseError) {
-                console.error('Error parsing job data:', parseError);
-                jobData = null;
-            }
+            
+            return { jobId, jobData: parsed };
         }
-        // If no data in localStorage or it's invalid, create fresh mock data
-        if (!jobId || !jobData) {
-            console.log('No valid job data found in localStorage, creating mock data');
-            const mockData = createMockJobData();
-            // Save to localStorage for persistence
-            localStorage.setItem('lastJobId', mockData.job_id);
-            localStorage.setItem('lastJobData', JSON.stringify(mockData));
-            console.log('Created and saved new mock data:', mockData);
-            return {
-                jobId: mockData.job_id,
-                jobData: mockData
-            };
-        }
-        return { jobId, jobData };
-    }
-    catch (e) {
-        console.error('Error retrieving job data from localStorage:', e);
-        // On any error, create and return fresh mock data
-        const mockData = createMockJobData();
-        try {
-            localStorage.setItem('lastJobId', mockData.job_id);
-            localStorage.setItem('lastJobData', JSON.stringify(mockData));
-        }
-        catch (storageError) {
-            console.error('Failed to store mock data in localStorage:', storageError);
-        }
-        return {
-            jobId: mockData.job_id,
-            jobData: mockData
-        };
+        return { jobId: null, jobData: null };
+    } catch (e) {
+        console.error("Error retrieving job data from localStorage:", e);
+        return { jobId: null, jobData: null };
     }
 }
 /**
