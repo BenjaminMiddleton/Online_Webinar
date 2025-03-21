@@ -7,25 +7,54 @@ import ChatBox from "../components/ChatBox";
 import styles from "./MinutesFrame.module.css";
 import { getLastJobData, joinJobRoom } from "../api/apiService";
 import { useNavigate } from "react-router-dom";
+// Default action points to display before any audio file is uploaded
+const DEFAULT_ACTION_POINTS = [
+    "Finalize design modifications for the Ford car concept (light, bumper, and wheel adjustments).",
+    "Have Ches develop a portfolio of car designs inspired by Lamborghini models.",
+    "Align marketing strategies between Ches, Envisage, and Caton to target high-net-worth clients.",
+    "Consult with Nick regarding repositioning Caton as a bespoke car brand.",
+    "Organize presentation training for Charlotte to ensure consistent fonts and layout.",
+    "Adjust Adobe Express/PowerPoint templates to standardize text size, formatting, and design elements.",
+    "Address and resolve calendar sharing and permission issues among team members.",
+];
+// Create default data structure that matches expected format
+const DEFAULT_JOB_DATA = {
+    status: "completed",
+    minutes: {
+        action_items: DEFAULT_ACTION_POINTS.map((text, index) => ({
+            id: `default-${index}`,
+            text,
+            done: false
+        })),
+        summary: "Default meeting summary - upload an audio file to generate real minutes.",
+        key_points: ["Default key point - upload an audio file to generate real meeting insights."],
+        transcription: "",
+        speakers: []
+    }
+};
 const MinutesFrame = () => {
     var _a, _b;
     const navigate = useNavigate();
     const [leftWidth, setLeftWidth] = useState(50); // Initial width percentage for the left container
     const [isRightCollapsed, setIsRightCollapsed] = useState(true);
     const [activeJobId, setActiveJobId] = useState(null);
-    const [jobData, setJobData] = useState(null);
+    // Initialize with default job data
+    const [jobData, setJobData] = useState(DEFAULT_JOB_DATA);
     const [error, setError] = useState(null);
     const [loading, setLoading] = useState(false);
     // Enhanced useEffect to retrieve data and set up socket listeners
     useEffect(() => {
         // First try to get data from localStorage
-        const { jobId, jobData } = getLastJobData();
+        const { jobId, jobData: storedJobData } = getLastJobData();
         if (jobId) {
             setActiveJobId(jobId);
             console.log(`Retrieved job ID from localStorage: ${jobId}`);
-            if (jobData) {
-                setJobData(jobData);
-                console.log('Retrieved job data from localStorage');
+            if (storedJobData) {
+                // Only override defaults if we have real data
+                if (storedJobData.minutes && storedJobData.status === "completed") {
+                    setJobData(storedJobData);
+                    console.log('Retrieved job data from localStorage');
+                }
             }
             else {
                 // If we have a job ID but no data, try to fetch it
@@ -103,7 +132,7 @@ const MinutesFrame = () => {
         console.log('New job created:', jobId, 'with data:', data);
         setActiveJobId(jobId);
         setError(null);
-        if (data) {
+        if (data && data.minutes) {
             setJobData(data);
             console.log('Setting job data:', data);
             try {
@@ -140,6 +169,7 @@ const MinutesFrame = () => {
         // Navigate to login page
         navigate("/");
     };
+    console.log("Current job data:", jobData); // Add this to debug the data being passed
     return (_jsxs("div", { className: styles.minutesFrame, children: [_jsx(NavBar, { onNewJobCreated: handleNewJobCreated, onArrowClick: handleNavigateToMeetings }), loading && (_jsxs("div", { className: styles.loadingOverlay, children: [_jsx("div", { className: styles.loadingSpinner }), _jsx("div", { className: styles.loadingText, children: "Loading job data..." })] })), error && (_jsxs("div", { className: styles.errorBanner, children: [error, _jsx("button", { className: styles.dismissButton, onClick: () => setError(null), children: "\u2715" })] })), _jsxs("div", { className: styles.mainContent, children: [_jsxs("div", { className: styles.leftContainer, style: { width: `${leftWidth}%` }, children: [_jsx(MinutesBox, { property1: "Expanded", jobId: activeJobId, jobData: jobData }), _jsx(TranscriptBox, { property1: "Expanded", jobId: activeJobId, transcription: (_a = jobData === null || jobData === void 0 ? void 0 : jobData.minutes) === null || _a === void 0 ? void 0 : _a.transcription, speakers: (_b = jobData === null || jobData === void 0 ? void 0 : jobData.minutes) === null || _b === void 0 ? void 0 : _b.speakers }), _jsx("div", { className: styles.transparentFrame })] }), !isRightCollapsed ? (_jsx("div", { className: styles.resizer, onMouseDown: handleMouseDown })) : (_jsx("div", { className: styles.spacer })), _jsx("div", { className: styles.rightContainer, style: isRightCollapsed ? { width: '50px' } : { width: `${100 - leftWidth}%` }, "data-collapsed": isRightCollapsed, children: _jsx(ChatBox, { collapsed: false, className: styles.chatBox, onCollapseChange: handleChatCollapseChange }) })] })] }));
 };
 export default MinutesFrame;
