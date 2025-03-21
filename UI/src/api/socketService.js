@@ -1,61 +1,27 @@
-import io from "socket.io-client";
-// Determine if we're in production mode
+// Remove the import of socket.io-client completely
+// import io from "socket.io-client";
+
+// Keep basic environment detection for logging
 const isProduction = import.meta.env.VITE_ENV === 'production' || !import.meta.env.VITE_ENV;
-// Check if we're running on GitHub Pages (no backend available)
 const isGitHubPages = window.location.hostname.includes('github.io');
-// Set socket URL based on environment
-const SOCKET_URL = isGitHubPages
-    ? null // No socket connection on GitHub Pages
-    : isProduction
-        ? window.location.origin // Use current origin for WebSockets in production
-        : (import.meta.env.VITE_SOCKET_URL || 'http://localhost:5000');
-// For debugging
+
+// For debugging - make it clear sockets are completely disabled
 console.log('Socket Service - Environment:', isProduction ? 'production' : 'development');
-console.log('Socket Service - Using Socket URL:', SOCKET_URL);
-console.log('Socket Service - GitHub Pages Mode:', isGitHubPages ? 'Yes (sockets disabled)' : 'No');
-// Socket.IO connection singleton
-let socket = null;
+console.log('Socket Service - Status: COMPLETELY DISABLED (using mock data only)');
+console.log('Socket Service - Demo Mode: Active (no socket connections will be attempted)');
+
 /**
- * Initialize and get a singleton Socket.IO connection
+ * Always returns null to completely disable socket connections
+ * This ensures we only use mock data
  */
 export function getSocket() {
-    // Don't even try to connect if on GitHub Pages
-    if (isGitHubPages) {
-        console.log('GitHub Pages mode: Socket connections disabled');
-        return null;
-    }
-    if (!socket) {
-        try {
-            socket = io(SOCKET_URL, {
-                path: '/socket.io',
-                transports: ['polling', 'websocket'], // Allow both transports for better compatibility
-                reconnection: true,
-                reconnectionAttempts: 10,
-                reconnectionDelay: 1000,
-                timeout: 20000,
-            });
-            // Set up default listeners for logging/debugging
-            socket.on('connect', () => {
-                console.log('Socket connected:', socket === null || socket === void 0 ? void 0 : socket.id);
-            });
-            socket.on('connect_error', (err) => {
-                console.error('Socket connection error:', err);
-            });
-        }
-        catch (error) {
-            console.error('Failed to initialize socket:', error);
-            return null;
-        }
-    }
-    return socket;
+  console.log('Socket connection requested but disabled - using mock data only');
+  return null;
 }
+
 /**
- * Disconnect and clean up the socket connection
+ * No-op function since sockets are disabled
  */
 export function disconnectSocket() {
-    if (socket) {
-        socket.disconnect();
-        socket = null;
-        console.log('Socket disconnected and reference cleared');
-    }
+  // No operation needed - sockets are never connected
 }

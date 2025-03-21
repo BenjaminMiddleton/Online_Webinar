@@ -7,27 +7,58 @@ import styles from "./MinutesFrame.module.css";
 import { getLastJobData, joinJobRoom } from "../api/apiService";
 import { useNavigate } from "react-router-dom";
 
+// Default action points to display before any audio file is uploaded
+const DEFAULT_ACTION_POINTS = [
+  "Finalize design modifications for the Ford car concept (light, bumper, and wheel adjustments).",
+  "Have Ches develop a portfolio of car designs inspired by Lamborghini models.",
+  "Align marketing strategies between Ches, Envisage, and Caton to target high-net-worth clients.",
+  "Consult with Nick regarding repositioning Caton as a bespoke car brand.",
+  "Organize presentation training for Charlotte to ensure consistent fonts and layout.",
+  "Adjust Adobe Express/PowerPoint templates to standardize text size, formatting, and design elements.",
+  "Address and resolve calendar sharing and permission issues among team members.",
+];
+
+// Create default data structure that matches expected format
+const DEFAULT_JOB_DATA = {
+  status: "completed",
+  minutes: {
+    action_items: DEFAULT_ACTION_POINTS.map((text, index) => ({
+      id: `default-${index}`,
+      text,
+      done: false
+    })),
+    summary: "Default meeting summary - upload an audio file to generate real minutes.",
+    key_points: ["Default key point - upload an audio file to generate real meeting insights."],
+    transcription: "",
+    speakers: []
+  }
+};
+
 const MinutesFrame: FunctionComponent = () => {
   const navigate = useNavigate();
   const [leftWidth, setLeftWidth] = useState(50); // Initial width percentage for the left container
   const [isRightCollapsed, setIsRightCollapsed] = useState(true);
   const [activeJobId, setActiveJobId] = useState<string | null>(null);
-  const [jobData, setJobData] = useState<any | null>(null);
+  // Initialize with default job data
+  const [jobData, setJobData] = useState<any | null>(DEFAULT_JOB_DATA);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState<boolean>(false);
 
   // Enhanced useEffect to retrieve data and set up socket listeners
   useEffect(() => {
     // First try to get data from localStorage
-    const { jobId, jobData } = getLastJobData();
+    const { jobId, jobData: storedJobData } = getLastJobData();
 
     if (jobId) {
       setActiveJobId(jobId);
       console.log(`Retrieved job ID from localStorage: ${jobId}`);
 
-      if (jobData) {
-        setJobData(jobData);
-        console.log('Retrieved job data from localStorage');
+      if (storedJobData) {
+        // Only override defaults if we have real data
+        if (storedJobData.minutes && storedJobData.status === "completed") {
+          setJobData(storedJobData);
+          console.log('Retrieved job data from localStorage');
+        }
       } else {
         // If we have a job ID but no data, try to fetch it
         setLoading(true);
@@ -117,7 +148,7 @@ const MinutesFrame: FunctionComponent = () => {
     setActiveJobId(jobId);
     setError(null);
 
-    if (data) {
+    if (data && data.minutes) {
       setJobData(data);
       console.log('Setting job data:', data);
 
@@ -162,6 +193,8 @@ const MinutesFrame: FunctionComponent = () => {
     // Navigate to login page
     navigate("/");
   };
+
+  console.log("Current job data:", jobData); // Add this to debug the data being passed
 
   return (
     <div className={styles.minutesFrame}>

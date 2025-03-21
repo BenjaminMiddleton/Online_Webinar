@@ -1,27 +1,77 @@
-import { FunctionComponent, useState, useEffect } from "react";
-import NavBar from "./NavBar";
-import MinutesBox from "./MinutesBox";
-import ChatBox from "./ChatBox";
+import React, { FunctionComponent, useState, useEffect } from "react";
+import NavBar from "../components/NavBar";
+import MinutesBox from "../components/MinutesBox";
+import TranscriptBox from "../components/TranscriptBox";
+import ChatBox from "../components/ChatBox";
 import styles from "./MinutesFrame.module.css";
+import { getLastJobData, joinJobRoom } from "../api/apiService";
+import { createMockJobData } from "../api/mockData";
+import { useNavigate } from "react-router-dom";
 
 const MinutesFrame: FunctionComponent = () => {
-  const [chatCollapsed, setChatCollapsed] = useState(true);
+  const navigate = useNavigate();
+  const [leftWidth, setLeftWidth] = useState(50); // Initial width percentage for the left container
+  const [isRightCollapsed, setIsRightCollapsed] = useState(true);
   const [activeJobId, setActiveJobId] = useState<string | null>(null);
+  const [jobData, setJobData] = useState<any | null>(null);
+  const [error, setError] = useState<string | null>(null);
+  const [loading, setLoading] = useState<boolean>(true);  // Start with loading state
 
-  // Retrieve most recent jobId when component mounts
+  // Always initialize with job data - this runs immediately on component mount
   useEffect(() => {
-    // You could fetch the most recent job ID from an API endpoint
-    // For now, we'll use localStorage as an example
-    const savedJobId = localStorage.getItem('lastJobId');
-    if (savedJobId) {
-      setActiveJobId(savedJobId);
-    }
-  }, []);
+    console.log("MinutesFrame - Initializing component");
+    
+    // Get data with guaranteed mock fallback
+    const { jobId, jobData: storedJobData } = getLastJobData();
+    console.log('MinutesFrame - Retrieved job data:', { jobId, storedJobData });
 
-  const handleNewJobCreated = (jobId: string) => { // Add type annotation
+    // Always set the data - our getLastJobData ensures we always have something
     setActiveJobId(jobId);
-    localStorage.setItem('lastJobId', jobId);
-  };
+    setJobData(storedJobData);
+    setLoading(false);
+    
+    // Also set up socket listeners just in case a real connection exists
+    if (jobId) {
+      // This won't do anything in demo mode, but doesn't hurt to call
+      const cleanup = joinJobRoom(
+        jobId,
+        (updateData) => {
+          console.log('Processing update:', updateData);
+        },
+        (completeData) => {
+          console.log('Processing complete:', completeData);
+          setJobData(completeData);
+          
+          try {
+            localStorage.setItem('lastJobData', JSON.stringify(completeData));
+          } catch (e) {
+            console.error('Error storing job data in localStorage:', e);
+          }
+        }
+      );
+      
+      return cleanup;
+    }
+    
+    return undefined;
+  }, []);
+  
+  // If somehow we still don't have data after initialization, create it
+  useEffect(() => {
+    if (!loading && !jobData) {
+      console.log("No job data found after initialization, creating mock data");
+      const mockData = createMockJobData();
+      setJobData(mockData);
+      setActiveJobId(mockData.job_id);
+      
+      try {
+        localStorage.setItem('lastJobId', mockData.job_id);
+        localStorage.setItem('lastJobData', JSON.stringify(mockData));
+      } catch (e) {
+        console.error('Error storing mock job data in localStorage:', e);
+      }
+    }
+  }, [loading, jobData]);
 
   return (
     <div className={styles.minutesFrame}>

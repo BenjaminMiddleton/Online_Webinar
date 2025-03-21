@@ -1,7 +1,7 @@
 /// <reference types="vite/client" />
 import type { Socket as SocketType } from "socket.io-client";
 import { getSocket } from './socketService';
-import { mockMeetingData } from './mockData';
+import { mockMeetingData, createMockJobData } from './mockData';
 
 // Determine if we're in production mode
 const isProduction = import.meta.env.VITE_ENV === 'production' || !import.meta.env.VITE_ENV;
@@ -10,7 +10,6 @@ const isProduction = import.meta.env.VITE_ENV === 'production' || !import.meta.e
 const isGitHubPages = window.location.hostname.includes('github.io');
 
 // Use environment variables with fallbacks
-// In production with Railway, we can use relative URLs as the backend serves the frontend
 const API_URL = isGitHubPages 
   ? null // No API available on GitHub Pages
   : isProduction 
@@ -43,6 +42,21 @@ export interface JobResponse {
   timestamp?: string;
   pdf_path?: string;
 }
+
+// Force create mock data if needed (called during import)
+(() => {
+  console.log('API Service - Checking mock data initialization');
+  try {
+    if (!localStorage.getItem('lastJobId') || !localStorage.getItem('lastJobData')) {
+      const mockData = createMockJobData();
+      console.log('API Service - Creating new mock data:', mockData);
+      localStorage.setItem('lastJobId', mockData.job_id);
+      localStorage.setItem('lastJobData', JSON.stringify(mockData));
+    }
+  } catch (e) {
+    console.error('API Service - Error initializing mock data:', e);
+  }
+})();
 
 /**
  * Upload a file to the backend
@@ -115,22 +129,61 @@ export async function getJobStatus(jobId: string): Promise<JobResponse> {
 }
 
 /**
- * Helper to retrieve job data from localStorage
+ * Helper to retrieve job data from localStorage with guaranteed mock fallback
  */
-export function getLastJobData(): { jobId: string | null, jobData: any | null } {
+export function getLastJobData(): { jobId: string; jobData: JobResponse } {
   try {
     const jobId = localStorage.getItem('lastJobId');
     const jobDataStr = localStorage.getItem('lastJobData');
     
     let jobData = null;
     if (jobDataStr) {
-      jobData = JSON.parse(jobDataStr);
+      try {
+        jobData = JSON.parse(jobDataStr);
+        // Validate the parsed data has required fields
+        if (!jobData || !jobData.minutes || !jobData.status) {
+          throw new Error('Invalid job data structure');
+        }
+      } catch (parseError) {
+        console.error('Error parsing job data:', parseError);
+        jobData = null;
+      }
+    }
+    
+    // If no data in localStorage or it's invalid, create fresh mock data
+    if (!jobId || !jobData) {
+      console.log('No valid job data found in localStorage, creating mock data');
+      const mockData = createMockJobData();
+      
+      // Save to localStorage for persistence
+      localStorage.setItem('lastJobId', mockData.job_id);
+      localStorage.setItem('lastJobData', JSON.stringify(mockData));
+      
+      console.log('Created and saved new mock data:', mockData);
+      return { 
+        jobId: mockData.job_id, 
+        jobData: mockData 
+      };
     }
     
     return { jobId, jobData };
   } catch (e) {
     console.error('Error retrieving job data from localStorage:', e);
-    return { jobId: null, jobData: null };
+    
+    // On any error, create and return fresh mock data
+    const mockData = createMockJobData();
+    
+    try {
+      localStorage.setItem('lastJobId', mockData.job_id);
+      localStorage.setItem('lastJobData', JSON.stringify(mockData));
+    } catch (storageError) {
+      console.error('Failed to store mock data in localStorage:', storageError);
+    }
+    
+    return { 
+      jobId: mockData.job_id, 
+      jobData: mockData 
+    };
   }
 }
 
