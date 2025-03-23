@@ -3,5 +3,5 @@ import react from '@vitejs/plugin-react';
 
 export default defineConfig({
   plugins: [react()],
-  base: '/OnlineWebinar/',  // This should match your repository name
+  base: '/Online_Webinar/',  // This should match your repository name
 });
