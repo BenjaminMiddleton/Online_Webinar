@@ -1,20 +1,21 @@
 // Enhanced mock data with professional meeting content
 export const mockMeetingData = {
-    title: "Advanced Air Mobility: Webinar",
-    duration: "00:12:49",
-    summary: "This final webinar of the NAA’s supply chain transition program provided an overview of the advanced air mobility (AAM) sector, covering both passenger/cargo aircraft and drone applications. Clyde discussed market forecasts, certification delays, infrastructure challenges, and diverse use cases—from urban transit to emergency services—highlighting the sector’s potential economic impact. The session concluded with an invitation for further questions and resource sharing.",
-    action_points: [
-        "Distribute the webinar recording and slides to all attendees.",
-        "Share the UK drone industry resource and PwC market report details.",
-        "Gather and follow up on any questions raised during the session.",
-        "Monitor and communicate updates on BVLOS regulation from the CAA.",
-        "Reach out to potential supply chain stakeholders in the advanced air mobility sector.",
-        "Compile key market forecasts and certification challenges for internal review.",
-    ],
-    transcription: `For the Supply Chain Transition Program—which is a public program that the NAA has been running since May last year—it has funded a series of webinars around the aerospace industry, also covering space and, as you see today, enhanced air mobility. This program comes to an end at the end of March, so this is actually the last webinar in that series. I am very pleased that Clyde is able to run this again. It is the second time he has given us this webinar because it has been quite popular. I will now hand over to Clyde to introduce himself and take us through an introduction to AAM.
-    
+  title: "Advanced Air Mobility: Webinar",
+  duration: "00:12:49",
+  summary: "This final webinar of the NAA’s supply chain transition program provided an overview of the advanced air mobility (AAM) sector, covering both passenger/cargo aircraft and drone applications. Clyde discussed market forecasts, certification delays, infrastructure challenges, and diverse use cases—from urban transit to emergency services—highlighting the sector’s potential economic impact. The session concluded with an invitation for further questions and resource sharing.",
+  action_points: [
+      "Distribute the webinar recording and slides to all attendees.",
+      "Share the UK drone industry resource and PwC market report details.",
+      "Gather and follow up on any questions raised during the session.",
+      "Monitor and communicate updates on BVLOS regulation from the CAA.",
+      "Reach out to potential supply chain stakeholders in the advanced air mobility sector.",
+      "Compile key market forecasts and certification challenges for internal review.",
+  ],
+  speakers: ["James Wilson", "Sarah Chen", "Michael Thompson", "Emma Rodriguez"],
+  transcription: `For the Supply Chain Transition Program—which is a public program that the NAA has been running since May last year—it has funded a series of webinars around the aerospace industry, also covering space and, as you see today, enhanced air mobility. This program comes to an end at the end of March, so this is actually the last webinar in that series. I am very pleased that Clyde is able to run this again. It is the second time he has given us this webinar because it has been quite popular. I will now hand over to Clyde to introduce himself and take us through an introduction to AAM.
+  
 Clyde:
- Afternoon, everybody. It is good to see so many people joining. I will give you a brief introduction to the advanced air mobility sector, which will include both passenger-carrying aircraft and non-passenger carrying drones. If you have any questions, feel free to raise your hand as we go along or ask them at the end. There may be some questions we want to address after the call if they are more involved.
+Afternoon, everybody. It is good to see so many people joining. I will give you a brief introduction to the advanced air mobility sector, which will include both passenger-carrying aircraft and non-passenger carrying drones. If you have any questions, feel free to raise your hand as we go along or ask them at the end. There may be some questions we want to address after the call if they are more involved.
 We have just a few more people joining. I hesitated at the beginning and received a note asking if I wanted to include some additional instructions for those who have just joined. I can sort those people out in the background if needed.
 As you know, there is a lot of interest in the advanced air mobility sector. You are probably here because you want to understand if the products or services you provide could succeed within it. There is a broad range of opportunities, so let us take a look at what we are discussing today.
 The market scope includes passenger-carrying advanced air mobility vehicles—these are disruptive, electric, hybrid-electric, or hydrogen-powered vertical takeoff and landing aircraft, as well as short takeoff and landing or conventional aircraft that can also carry cargo. It is not just about electric vertical takeoff and landing aircraft; it also includes those that look more conventional but are powered differently, and even unmanned aircraft designed to fly without any people onboard.

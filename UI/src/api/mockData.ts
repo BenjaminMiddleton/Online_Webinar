@@ -11,6 +11,7 @@ export const mockMeetingData = {
       "Reach out to potential supply chain stakeholders in the advanced air mobility sector.",
       "Compile key market forecasts and certification challenges for internal review.",
   ],
+  speakers: ["James Wilson", "Sarah Chen", "Michael Thompson", "Emma Rodriguez"],  
   transcription: `For the Supply Chain Transition Program—which is a public program that the NAA has been running since May last year—it has funded a series of webinars around the aerospace industry, also covering space and, as you see today, enhanced air mobility. This program comes to an end at the end of March, so this is actually the last webinar in that series. I am very pleased that Clyde is able to run this again. It is the second time he has given us this webinar because it has been quite popular. I will now hand over to Clyde to introduce himself and take us through an introduction to AAM.
   
 Clyde:
