@@ -1,7 +1,7 @@
 // Enhanced mock data with professional meeting content
 export const mockMeetingData = {
     title: "Advanced Air Mobility: Webinar",
-    duration: "00:09:45",
+    duration: "00:12:49",
     summary: "This final webinar of the NAA’s supply chain transition program provided an overview of the advanced air mobility (AAM) sector, covering both passenger/cargo aircraft and drone applications. Clyde discussed market forecasts, certification delays, infrastructure challenges, and diverse use cases—from urban transit to emergency services—highlighting the sector’s potential economic impact. The session concluded with an invitation for further questions and resource sharing.",
     action_points: [
         "Distribute the webinar recording and slides to all attendees.",
